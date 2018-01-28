@@ -1,6 +1,5 @@
 # Summary
 
-* [Home](home.md)
 * [Linux](README.md)
 * [C\#](c.md)
 * [Excel](excel.md)
