@@ -9,4 +9,5 @@
 * [Powershell](powershell.md)
 * [Python](python.md)
 * [VSCode](vscode.md)
+* [Linux](linux.md)
 
