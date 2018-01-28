@@ -5,15 +5,14 @@ Sessions
 
 PREFIX is `CTRL,b`
 
-|Shortcut|Description|
+Shortcut|Description|
 -|-
-tmux new -s SESSIONNAME | 
 tmux ls | Lists sessions
+tmux new -s SESSIONNAME | Create new session
 PREFIX,c | Create new session
 PREFIX,w | Show all sessions, windows, and tabs. Arrows to browse; enter to select
 PREFIX,% | Vertical split
 PREFIX," | Horizontal split
-
 ```
 $ cat ~/.inputrc
 "\e[A":history-search-backward

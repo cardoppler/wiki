@@ -9,5 +9,4 @@
 * [Powershell](powershell.md)
 * [Python](python.md)
 * [VSCode](vscode.md)
-* Home
 
