@@ -1,6 +1,6 @@
 # Summary
 
-* [Linux](README.md)
+* [README](README.md)
 * [C\#](c.md)
 * [Excel](excel.md)
 * [Git](git.md)
