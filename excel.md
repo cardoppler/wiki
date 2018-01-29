@@ -47,4 +47,4 @@ Resources used:
 - https://stackoverflow.com/questions/8146485/returning-a-regex-match-in-vba-excel
 
 ### Filter rows based on a list of values
-`=IF(ISERROR(VLOOKUP(A2,Sheet2!A:A,1,FALSE)),"NotInList","InList")`
+`=IF(ISERROR(VLOOKUP(A1,Sheet2!A:A,1,FALSE)),"NotInList","InList")`
