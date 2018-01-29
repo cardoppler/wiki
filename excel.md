@@ -46,5 +46,5 @@ Resources used:
 - https://stackoverflow.com/questions/22542834/how-to-use-regular-expressions-regex-in-microsoft-excel-both-in-cell-and-loops
 - https://stackoverflow.com/questions/8146485/returning-a-regex-match-in-vba-excel
 
-### Filter rows based on a list os valued
+### Filter rows based on a list of values
 `=IF(ISERROR(VLOOKUP(A2,Sheet2!A:A,1,FALSE)),"NotInList","InList")`
