@@ -20,3 +20,15 @@
 
 - Delete everything in S3, shut down the `RootCA`.
 
+## 3) Create a certificate template with server authentication (not client) and autoenrollment enabled on SubordinateCA.
+Once done, the Domain Controllers can obtain a certificate through autoenrollment to enable LDAPS.
+
+## 4) Configure AWS security group rules
+For the Domain Controllers to request a certificate from the `subordinateCA`:
+4.1) accept incoming traffic directed to the `subordinateCA` from the Domain Controllers
+4.2) allow outbound traffic from from the Domain Controllers to the `subordinateCA`
+
+## 5) Auto-enabled LDAPS configuration
+AWS Microsoft AD Domain Controllers will automatically see the published template and they will request a certificate from the `subordinateCA`. The `subordinateCA` will take up to 180 minutes to issue the certificate to the DCs. Once this happens, the DC will receive the cert, import it and enable LDAPS.
+
+## 6) Test LDAPS
