@@ -57,6 +57,12 @@ $ cut -c91- *v03.log | nl
 $ head -n3 2017-09-29\ stalled.csv | grep -oP '(?<=MsgSourceID = ).*' | nl
 ```
 
+## tr
+```
+tr -d "\n" # removes a newline character
+tr -- '+=/' '-_~' #  replaces characters that are not valid o the left with characters that are valid on the right.
+```
+
 ## Docker
 Install https://download.docker.com/win/stable/DockerToolbox.exe, open it an run
 ```
