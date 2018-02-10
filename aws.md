@@ -12,7 +12,7 @@
 
 2.c) Log in to `SubordinateCA` as the `CAAdmin`. Download `RootCA’s public certificate` and `CRL` from the S3 bucket and adde them to the local store of `SubordinateCA`. Finally, publish the `RootCA’s public certificate` to the domain.
 
-2.d) Make the `SubordinateCA` a real Microsoft **Enterprise** CA using the AD Certificate Services Configuration tool. This generates a Certificate Request; upload it to S3.
+2.d) Make the `SubordinateCA` a real Microsoft **Enterprise** CA using the AD Certificate Services Configuration tool. This generates a Certificate Request; upload it to S3. (LDAPS with AWS Microsoft AD does not support certificates that are issued by a **Standalone** CA but only by an **Enterprise** CA)
  
 2.e) Log in to `RootCA` as `RootAdmin`, download the `Certificate Request` from the S3 and approve it (f). This generated a `subordinateCA.crt`; upload it to S3.
 
@@ -20,15 +20,15 @@
 
 - Delete everything in S3, shut down the `RootCA`.
 
-## 3) Create a certificate template with server authentication (not client) and autoenrollment enabled on SubordinateCA.
-Once done, the Domain Controllers can obtain a certificate through autoenrollment to enable LDAPS.
+## 3) Create a certificate template 
+With **Server Authentication** and **Autoenrollment** enabled on `subordinateCA`. Once done, the Domain Controllers can obtain a certificate through autoenrollment to enable LDAPS. This certificate lets the LDAP service on the domain controllers listen for and automatically accept SSL connections from LDAP clients.
 
 ## 4) Configure AWS security group rules
 For the Domain Controllers to request a certificate from the `subordinateCA`:
 4.1) accept incoming traffic directed to the `subordinateCA` from the Domain Controllers
-4.2) allow outbound traffic from from the Domain Controllers to the `subordinateCA`
+4.2) allow outbound traffic from the Domain Controllers to the `subordinateCA`
 
 ## 5) Auto-enabled LDAPS configuration
 AWS Microsoft AD Domain Controllers will automatically see the published template and they will request a certificate from the `subordinateCA`. The `subordinateCA` will take up to 180 minutes to issue the certificate to the DCs. Once this happens, the DC will receive the cert, import it and enable LDAPS.
 
-## 6) Test LDAPS
+You can test the LDAPS connection to the AWS Microsoft AD directory using the `LDP tool`. The LDP tool comes with the Active Directory Administrative Tools. 
