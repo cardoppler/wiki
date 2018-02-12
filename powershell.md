@@ -1,9 +1,19 @@
+### Active-Directory
+```
+Get-ADUser SOMEUSERNAME -Properties *
+Get-ADComputer SOMECOMPUTERNAME -Properties *
+```
+
+### Convert time to human readable
+```
+[DateTime]::FromFileTime(131628203805456193)
+```
+
 ### Calculate MD5 hash
 With cmd prompt: `CertUtil -hashfile C:\path\to\file.exe MD5`
 With Powershell: `Get-FileHash C:\path\to\file.exe -Algorithm MD5`
 
-Start with a different HOME location:
-Right click on PW icon > Property > "Start in"
+Start with a different HOME location: `Right click on PW icon > Property > "Start in"`
 
 ### Profile location:
 `\\path\to\<USERNAME>\Documents\WindowsPowerShell\profile.ps1`
