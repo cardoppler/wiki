@@ -18,7 +18,7 @@ Start with a different HOME location: `Right click on PW icon > Property > "Star
 ### Profile location:
 
 ```
-> $profile
+> $profile | Format-List -Force
 \\path\to\<USERNAME>\Documents\WindowsPowerShell\profile.ps1
 \\SOMEHOSTNAME\userdata$\pietriri\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
 ```
