@@ -16,7 +16,12 @@ With Powershell: `Get-FileHash C:\path\to\file.exe -Algorithm MD5`
 Start with a different HOME location: `Right click on PW icon > Property > "Start in"`
 
 ### Profile location:
-`\\path\to\<USERNAME>\Documents\WindowsPowerShell\profile.ps1`
+
+```
+> $profile
+\\path\to\<USERNAME>\Documents\WindowsPowerShell\profile.ps1
+\\SOMEHOSTNAME\userdata$\pietriri\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+```
 
 ### Change prompt
 In "profile.ps1":
