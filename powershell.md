@@ -128,6 +128,10 @@ True     True     Char[]                                   System.Array
 
 ## Regex
 ```
+$inputFile = gc .\test.log
+$inputFile -match '(?<change>C\d+ xxx (?<numbers>\d+))'
+```
+```
 > [regex]$regex = "(?<GroupNameHere>C\d+)"
 > $inputFile = gc .\someInputFile.txt
 > $matches = $regex.Matches($inputFile)
