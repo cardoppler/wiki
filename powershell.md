@@ -128,6 +128,15 @@ True     True     Char[]                                   System.Array
 
 ## Regex
 ```
+> [regex]$regex = "(?<GroupNameHere>C\d+)"
+> $inputFile = gc .\someInputFile.txt
+> $matches = $regex.Matches($inputFile)
+> $matches
+> $matches.Value
+> $matches.Value | Out-File results.txt
+> gc .\results.txt
+```
+```
 > $input_path = ".\input-file.csv"
 > $output = ".\output-file.csv"
 > $regex = '^"\w+","(\w+)"'
