@@ -294,6 +294,11 @@ Recursively list all directories up to depth 2:
 > Invoke-WebRequest http://google.com -Proxy http://someproxy.com:8080:8080 -ProxyUseDefaultCredentials | Select-Object -ExpandProperty Headers
 ```
 
+### curl like
+```
+> Invoke-RestMethod "https://jsonplaceholder.typicode.com/users" -Proxy http://someproxy.com:8080 -ProxyUseDefaultCredentials | ConvertTo-Json -Depth 10
+```
+
 ## Wifi
 ```
 > netsh wlan show profile
