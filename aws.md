@@ -2,6 +2,9 @@
 `AssumeRole` and `GetSessionToken` can also be called without MFA information
 
 # MFA
+## MFA Delete
+S3 offers **MFA Delete** for `root` only. You can enable it when you setup versioning. MFA Delete cannot be applied to an IAM user and is managed independently from MFA-protected API access. An IAM user with permission to delete a bucket cannot delete a bucket with Amazon S3 MFA Delete enabled.
+
 ## MFA for normal access
 This `User-based policy` grants users permission to call the EC2 `StopInstances` and `TerminateInstances` actions only if the user has authenticated using MFA.
 ```
