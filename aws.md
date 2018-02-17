@@ -40,6 +40,44 @@ Imagine that you are in account A and you create an S3 bucket. You want to grant
 }
 ```
 
+### User-base policy that denies access to specific APIs without recent valid MFA Authentication 
+grants access to the entire Amazon EC2 API, but denies access to StopInstances and TerminateInstances unless the user authenticated with MFA within the last hour. 
+- The first statement (containing `"Sid": "AllowAllActionsForEC2"`) allows all Amazon EC2 actions. 
+- The second statement (containing `"Sid": "DenyStopAndTerminateWhenMFAIsNotPresent"`) denies the `StopInstances` and `TerminateInstances` actions when the MFA authentication context is missing (meaning MFA was not used). The condition check for `MultiFactorAuthPresent` in the `Deny` statement should not be a `{"Bool":{"aws:MultiFactorAuthPresent":false}}` because that key is not present and cannot be evaluated when MFA is not used. So instead, use the `BoolIfExists` check to see if the key is present before checking the value.
+- The third statement in the following example (containing `"Sid": "DenyStopAndTerminateWhenMFAIsOlderThanOneHour"`) contains an additional condition that denies the `StopInstances` and `TerminateInstances` actions when MFA authentication is present but occurred more than one hour prior to the request. The condition `aws:MultiFactorAuthAge` is only present when MFA context is present in the request. So statement 2 covers the case when MFA is not present at all, and statement 3 covers the case when MFA is present and evaluates whether it occurred in the proper time window. Again, when the key is not present, the ...IfExists causes the test to return true, the statement matches, and the user is denied access to those APIs.
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowAllActionsForEC2",
+      "Effect": "Allow",
+      "Action": "ec2:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyStopAndTerminateWhenMFAIsNotPresent",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:StopInstances",
+        "ec2:TerminateInstances"
+      ],
+      "Resource": "*",
+      "Condition": {"BoolIfExists": {"aws:MultiFactorAuthPresent": false}}
+    },
+    {
+      "Sid": "DenyStopAndTerminateWhenMFAIsOlderThanOneHour",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:StopInstances",
+        "ec2:TerminateInstances"
+      ],
+      "Resource": "*",
+      "Condition": {"NumericGreaterThanIfExists": {"aws:MultiFactorAuthAge": "3600"}}
+    }
+  ]
+}
+```
 ## MFA for API access
 (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_configure-api-require.html)
 
