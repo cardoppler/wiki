@@ -10,3 +10,4 @@
 * [Python](python.md)
 * [VSCode](vscode.md)
 * [Linux](linux.md)
+* [AWS](aws.md)
