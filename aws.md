@@ -1,4 +1,7 @@
 # IAM policies
+## User-based policy
+Active, "what can I do to X?". The `who` is the user that gets a policy attached to so the `Principal` is not specified in the polic.
+
 ## Resource-based policy (or ACL)
 Passive, "who can do what to me?" (I am the resource). The `principal` specified the **who**.
 
@@ -17,7 +20,21 @@ An S3 bucket policy that allows an IAM user named bob in AWS account 77778888999
   }
 }
 ```
-## What does this do?
+
+Trust policy of an IAM role that includes an MFA condition to test for the existence of MFA authentication. With this policy, users from the AWS account specified in the `rincipal`element can assume the role that this policy is attached to, but only if the user is MFA authenticated:
+```
+{
+  "Version": "2012-10-17",
+  "Statement": {
+    "Effect": "Allow",
+    "Principal": {"AWS": "ACCOUNT-B-ID"},
+    "Action": "sts:AssumeRole",
+    "Condition": {"Bool": {"aws:MultiFactorAuthPresent": "true"}}
+  }
+}
+```
+
+### What does this do?
 - `"Effect": "Deny"`
 - `"NotAction"`
 - `"Condition": { "BoolIfExists": { "aws:MultiFactorAuthPresent": "false" } }`
