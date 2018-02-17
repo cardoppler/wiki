@@ -1,5 +1,7 @@
 # IAM policies
-## Resource-based policy
+## Resource-based policy (or ACL)
+Passive, who can do what to me (I am the resource). The `principal` specified the **who**.
+
 An S3 bucket policy that allows an IAM user named bob in AWS account 777788889999 to put objects into the bucket called example-bucket:
 ```
 {
