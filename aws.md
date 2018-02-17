@@ -18,6 +18,25 @@ This `User-based policy` grants users permission to call the EC2 `StopInstances`
   }]
 }
 ```
+
+### MFA Protection for Resources That Have Resource-based Policies
+Imagine that you are in account A and you create an S3 bucket. You want to grant access to this bucket to users who are in several different AWS accounts, but only if those users are authenticated with MFA. Also this is an example of providing cross-account MFA protection without requiring users to assume a role first:
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Principal": {"AWS": ["ACCOUNT-A-ID", "ACCOUNT-B-ID", "ACCOUNT-C-ID"]},
+    "Action": [
+      "s3:PutObject",
+      "s3:DeleteObject"
+    ],
+    "Resource": ["arn:aws:s3:::ACCOUNT-A-BUCKET-NAME/*"],
+    "Condition": {"Bool": {"aws:MultiFactorAuthPresent": "true"}}
+  }]
+}
+```
+
 ## MFA for API access
 (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_configure-api-require.html)
 
