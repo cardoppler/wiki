@@ -1,3 +1,21 @@
+# IAM policies
+## Resource-based policy
+An S3 bucket policy that allows an IAM user named bob in AWS account 777788889999 to put objects into the bucket called example-bucket:
+```
+{
+  "Version": "2012-10-17",
+  "Statement": {
+    "Effect": "Allow",
+    "Principal": {"AWS": "arn:aws:iam::777788889999:user/bob"},
+    "Action": [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ],
+    "Resource": "arn:aws:s3:::example-bucket/*"
+  }
+}
+```
+
 # Enable LDAPS
 - https://aws.amazon.com/blogs/security/how-to-enable-ldaps-for-your-aws-microsoft-ad-directory/
 
