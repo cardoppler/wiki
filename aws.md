@@ -2,6 +2,22 @@
 `AssumeRole` and `GetSessionToken` can also be called without MFA information
 
 # MFA
+## MFA for normal access
+This `User-based policy` grants users permission to call the EC2 `StopInstances` and `TerminateInstances` actions only if the user has authenticated using MFA.
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Action": [
+      "ec2:StopInstances",
+      "ec2:TerminateInstances"
+    ],
+    "Resource": ["*"],
+    "Condition": {"Bool": {"aws:MultiFactorAuthPresent": "true"}}
+  }]
+}
+```
 ## MFA for API access
 (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_configure-api-require.html)
 
