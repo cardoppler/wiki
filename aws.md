@@ -1,3 +1,16 @@
+# STS
+`AssumeRole` and `GetSessionToken` can also be called without MFA information
+
+# MFA
+## MFA for API access
+(https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_configure-api-require.html)
+
+- To establish MFA protection for APIs, you add MFA conditions to policies. If a policy doesn't include the condition for MFAs, the policy does not enforce the use of MFA. If a policy includes an MFA condition, a request is denied if users have not been MFA authenticated, or if they provide an invalid MFA device identifier or invalid TOTP.
+- MFA protection is available **only with temporary security credentials**, which must be obtained with `AssumeRole` or `GetSessionToken`. **long-term credentials** (IAM user access keys and root user access keys) cannot be used with MFA-protected API access because they don't expire.
+- No MFA-protected API for `root` user.
+- When the user is authenticated by an external provider (`AssumeRoleWithWebIdentity` and `AssumeRoleWithSAML`) AWS cannot determine whether that provider required MFA. So **federated users** cannot be assigned an MFA device for use with AWS services, so they cannot access AWS resources controlled by MFA. 
+- For **cross-account** delegation, if the role's trust policy doesn’t include an MFA condition then there is no MFA protection for the API calls that are made with the role's temporary security credentials. When you allow another AWS account to access resources in your account, even when you require multi-factor authentication, the security of your resources depends on the configuration of the trusted account aka the other account (not yours). Any identity in the trusted account that has permission to create virtual MFA devices can construct an MFA claim to satisfy that part of your role's trust policy. Before you allow another account's access to your AWS resources that require multi-factor authentication, you should ensure that the trusted account's owner follows security best practices and restricts access to sensitive APIs—such as MFA device-management APIs—to specific, trusted identities.
+
 # IAM policies
 ## User-based policy
 Active, "what can I do to X?". The `who` is the user that gets a policy attached to so the `Principal` is not specified in the polic.
