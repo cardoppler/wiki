@@ -1,8 +1,8 @@
 # STS
 
 ## API methods
-- `AssumeRole`. You must call this API using existing IAM user credentials.
-- `GetSessionToken` 
+### `AssumeRole` call. 
+You must call this API using existing IAM user credentials. 
 
 **Request** must contain:
 - `ARN` of the role that the app should assume.
@@ -12,16 +12,37 @@
 - (Optional) `MFA identifier` and OTP
 - (Optional) `ExternalID`.
 
-
 **Responses** return:
 - Access Key:
   - Access Key ID
   - Secret Access Key
 - Session Token
-??? Duration (1-36 hours)
+
+
+### `GetSessionToken` API call.
+- The primary reason for calling `GetSessionToken` is that a user needs to perform actions that are allowed only when the user is authenticated with multi-factor authentication (MFA).
+- temporary security credentials for an IAM user are valid for a maximum of 12 hours, but you can request a duration as short as 15 minutes or as long as 36 hours. A token for an AWS account root user is restricted to a duration of one hour.
+- If `GetSessionToken` is called with the credentials of an IAM user, the temporary security credentials have the same permissions as the IAM user.
+- Pro: You can use the credentials to access the AWS Management Console.
+- COns: You cannot use the credentials to call IAM or STS APIs but only to call some You can use them to call APIs for other AWS services.
+
+### Other API calls:
+- `AssumeRoleWithWebIdentity`, `AssumeRoleWithSAML`
+
+## AssumeRole vs GetSessionToken
+| AWS STS API | Who can call | Credential lifetime (min/max/default) | MFA support* | Passed policy support |Restrictions on resulting temporary credentials |
+|-|-|-|-|-|-|
+`AssumeRole` | IAM user or user with existing temporary security credentials | 15m/1hr/1hr | Yes | Yes | Cannot call GetFederationToken or GetSessionToken. |
+`GetSessionToken` | IAM user or root user | IAM user: 15m/36hr/12hr. Root user: 15m/1hr/1hr | Yes | No | Cannot call IAM APIs unless MFA information is included with the request.Cannot call AWS STS APIs except AssumeRole or GetCallerIdentity. Single sign-on (SSO) to console is not allowed, but any user with a password (root or IAM user) can sign into the console.*
+|
+
 
 ## Endpoints
-STS is global, but you can choose an endpoint closer to you to reduce latency.
+STS is a single global (https://sts.amazonaws.com) physically located in us-east-1 i.e. the US East (N. Virginia) region, but you can choose an endpoint closer to you to reduce latency (https://sts.us-west-2.amazonaws.com). If you activate regional STS endpoints you must also turn on CloudTrail logging in those regions to record any API calls. 
+
+## Disabling temporary security credentials 
+They are valid until they expire, and they **cannot be revoked**. However, because permissions are evaluated each time an AWS request is made using the credentials, you can achieve the effect of revoking the credentials by changing the permissions for the credentials even after they have been issued.
+- Note: You cannot change the permissions for an AWS account root user. Likewise, you cannot change the permissions for the temporary security credentials that were created by calling GetFederationToken or GetSessionToken while signed in as the root user. 
 
 # MFA
 ## MFA Delete
@@ -121,80 +142,30 @@ grants access to the entire Amazon EC2 API, but denies access to StopInstances a
 
 **Service-linked role**: predefined by the service and include all the permissions that the service requires to call other AWS services on your behalf. A service might automatically create or delete the role
 
-### Role policies:
-Any role contains two policies
-- **trust policy** Defines who is allowed to assume the role (the trusted entity or principal). You cannot specify a wildcard (\*) as a `Principal`.
-- **permission policy** defines what actions and resources the role can use/do.
+## Policies
+[AWS Docs](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html)
 
-Example. The policy specifies that the user can only switch to a role in that account if the role name begins with the letters "Test" followed by any other combination of characters.
-```
-{
-  "Version": "2012-10-17",
-  "Statement": {
-    "Effect": "Allow",
-    "Action": "sts:AssumeRole",
-    "Resource": "arn:aws:iam::ACCOUNT-ID-WITHOUT-HYPHENS:role/Test*"
-  }
-}
-```
+The evaluation logic:
+![](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/AccessPolicyLanguage_Evaluation_Flow.diagram.png)
+1. By default, all requests are denied.
+2. An explicit allow overrides this default.
+3. An explicit deny overrides any allows.
 
-## Delegation
+The order in which the policies are evaluated has no effect: all policies are evaluated.
 
-You can only delegate permissions equivalent to, or less than, the permissions granted to your account by the resource owning account.
+## Identity-Based Policies
+attach to a principal (or identity), such as an IAM user, role, or group.
+Active, "what can I do to X?". The `who` is the user that gets a policy attached to so the `Principal` is not specified in the policy. The permissions that the role grants to the user do not add to the permissions already granted to the user. When a user **switches to a role**, the user **temporarily gives up his or her original permissions** in exchange for those granted by the role. When the user exits the role, then the original user permissions are automatically restored.
 
-![Resource-based delegation](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/Delegation.diagram.png "Delegation diagram")
+- **Managed**. A new version of the managed policy (up to 5) is created whenever you or AWS updates a Managed policy (no versioning for inline policies).
+  - AWS Managed
+  - Customer managed
+- **Inline**. Embedded directly into a single user, group, or role. Useful if you want to maintain a strict one-to-one relationship between a policy and the principal entity that it's applied to. For example, you want to be sure that the permissions in a policy are not inadvertently assigned to a principal entity other than the one they're intended for. If you delete the Principal via the Console, the inline policies are deleted too.
 
-1. Account A gives account B full access to account A's S3 bucket by naming account B as a principal in the policy. As a result, account B is authorized to perform any action on account A's bucket, and the account B administrator can delegate access to its users in account B.
-2. The account B administrator grants user 1 read-only access to account A's S3 bucket. User 1 can view the objects in account A's bucket. The level of access account B can delegate is equivalent to, or less than, the access the account has. In this case, the full access granted to account B is filtered to read only for user 1.
-3. The account B administrator does not give access to user 2. Because users by default do not have any permissions except those that are explicitly granted, user 2 does not have access to account A's Amazon S3 bucket.
-
-## Example Separate Development and Production Accounts
-[AWS Docs - Separate Development and Production Accounts](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_common-scenarios_aws-accounts-example.html)
-![Separate Development and Production Accounts](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/roles-usingroletodelegate.png "Separate Development and Production Accounts")
-1. The admin of *production account*:
-- creates the `UpdateAPP` and defines a `trust policy` that specifies the  *development account* as a `Principal`: authorized users from the development account can use the UpdateAPP role. 
-- Creates a `permissions policy` for the role that specifies that users of the role have read and write permissions to the bucket named *productionapp*.
-- give the account number and name of the role (for AWS console users) or the Amazon Resource Name (ARN) (for AWS CLI, Tools for Windows PowerShell, or AWS API access) of the role with anyone who needs to assume the role. The role ARN might look like `arn:aws:iam::123456789012:role/UpdateAPP`.
-2. The admin of the *Development account* grants the developers permission to call STS `AssumeRole` API for the `UpdateAPP` role.
-
-## Providing Access to AWS Accounts Owned by Third Parties
-[AWS - Docs: Using an External ID for Third-Party Access](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html)
-
-You can use roles to delegate access. The third parties must provide A) its own AWS *account ID* and B) a secret *external ID*, both need to be specified in the `trust policy` for the role.
-```
-"Principal": {"AWS": "Example Corp's AWS Account ID"},
-"Condition": {"StringEquals": {"sts:ExternalId": "Unique ID Assigned by Example Corp"}}
-```
-When Example Corp needs to access your AWS resources, someone from the company calls the AWS `sts:AssumeRole` API. The call includes the ARN of the role to assume and the `ExternalID` parameter that corresponds to your customer ID. In other words, when a role policy includes an `external ID`, anyone who wants to assume the role must be a principal in the role and must include the correct `external ID` which solves the "confused deputy problem". You are an AWS account owner and you have configured a role for a third party that accesses other AWS accounts in addition to yours. You should ask the third party for an external ID that it includes when it assumes your role. Then you check for that external ID in your role's trust policy. Doing so ensures that the external party can assume your role only when it is acting on your behalf.
-![](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/confuseddeputymitigation2.png)
-
-## Custom identity broker application to federate user access to AWS
-[AWS Docs - identity broker application to federate user access to AWS](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_common-scenarios_federated-users.html)
-![identity broker application](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/enterprise-authentication-with-identity-broker-application.diagram.png "Identity Broker Application")
-
-2. The identity broker application is able to verify that employees are authenticated within the existing authentication system.
-
-3. Is doing a `AssumeRole` or `GetFederationToken` API call to STS which returns the credentials.
-
-4. Users are able to get a temporary URL that gives them access to the AWS Management Console (which is referred to as single sign-on).
-
-### Using SAML-Based Federation for API Access to AWS
-Dropbox like desktop app that copies data from computer to a backup folder in S3:
-![](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/saml-based-federation.diagram.png)
-
-### SAML-enabled single sign-on
-Inside your organization's network, you configure your identity store (such as Windows Active Directory) to work with a SAML-based identity provider (IdP) like Windows Active Directory Federation Services, Shibboleth
-![](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/saml-based-sso-to-console.diagram.png)
-
-## Policies 
-
-### User-based policy
-Active, "what can I do to X?". The `who` is the user that gets a policy attached to so the `Principal` is not specified in the polic.
-
-The permissions that the role grants to the user do not add to the permissions already granted to the user. When a user **switches to a role**, the user **temporarily gives up his or her original permissions** in exchange for those granted by the role. When the user exits the role, then the original user permissions are automatically restored.
-
-### Resource-based policy (or ACL)
+## Resource-based policies (or ACLs)
 [Roles vs. Resource-based Policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_compare-resource-policies.html).
+- To be attached to a resource such as an Amazon S3 bucket.
+- Are **inline** policies only and not managed.
 - Passive, "who can do what to me?" (I am the resource). The `principal` specified the **who**. For 
 - Useful for **cross-account** access. You can attach a policy directly to the resource that you want to share, instead of using a role as a proxy. The resource that you want to share must support resource-based policies. Unlike a user-based policy, a resource-based policy specifies who (in the form of a list of AWS account ID numbers) can access that resource. Advantage over a role: with a resource-based policy, **the user still works in the trusted account and does not have to give up his or her user permissions in place of the role permissions** (as instead has to do if using a proxy role).
 - Not all services support resource-based policies: only S3 buckets, Glacier vaults, SNS topics, and SQS queues.
@@ -259,6 +230,74 @@ Trust policy of an IAM role that includes an MFA condition to test for the exist
         }
 ```
 The above policy uses a combination of "Deny" and "NotAction" to deny all actions for all other AWS services if the user is not signed-in with MFA. If the user is signed-in with MFA, then the "Condition" test fails and the final "deny" statement has no effect and other permissions granted to the user can take effect. This last statement ensures that when the user is not signed-in with MFA that they can perform only the IAM actions allowed in the earlier statements. The ...IfExists version of the Bool operator ensures that if the aws:MultiFactorAuthPresent key is missing, the condition returns true This means that a user accessing an API with long-term credentials, such as an access key, is denied access to the non-IAM API operations (https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_users-self-manage-mfa-and-creds.html)
+
+## Role policies:
+Any role contains two policies:
+- **trust policy** Defines who is allowed to assume the role (the trusted entity or principal). You cannot specify a wildcard (\*) as a `Principal`.
+- **permission policy** defines what actions and resources the role can use/do.
+
+Example. The policy specifies that the user can only switch to a role in that account if the role name begins with the letters "Test" followed by any other combination of characters.
+```
+{
+  "Version": "2012-10-17",
+  "Statement": {
+    "Effect": "Allow",
+    "Action": "sts:AssumeRole",
+    "Resource": "arn:aws:iam::ACCOUNT-ID-WITHOUT-HYPHENS:role/Test*"
+  }
+}
+```
+
+## Permissions
+An IAM user might be granted access to create a resource, but the user's permissions, even for that resource, are limited to what's been explicitly granted. This means that just because you create a resource, such as an IAM role, you do not automatically have permission to edit or delete that role
+
+## Delegation
+
+You can only delegate permissions equivalent to, or less than, the permissions granted to your account by the resource owning account.
+
+![Resource-based delegation](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/Delegation.diagram.png "Delegation diagram")
+
+1. Account A gives account B full access to account A's S3 bucket by naming account B as a principal in the policy. As a result, account B is authorized to perform any action on account A's bucket, and the account B administrator can delegate access to its users in account B.
+2. The account B administrator grants user 1 read-only access to account A's S3 bucket. User 1 can view the objects in account A's bucket. The level of access account B can delegate is equivalent to, or less than, the access the account has. In this case, the full access granted to account B is filtered to read only for user 1.
+3. The account B administrator does not give access to user 2. Because users by default do not have any permissions except those that are explicitly granted, user 2 does not have access to account A's Amazon S3 bucket.
+
+## Example Separate Development and Production Accounts
+[AWS Docs - Separate Development and Production Accounts](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_common-scenarios_aws-accounts-example.html)
+![Separate Development and Production Accounts](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/roles-usingroletodelegate.png "Separate Development and Production Accounts")
+1. The admin of *production account*:
+- creates the `UpdateAPP` and defines a `trust policy` that specifies the  *development account* as a `Principal`: authorized users from the development account can use the UpdateAPP role. 
+- Creates a `permissions policy` for the role that specifies that users of the role have read and write permissions to the bucket named *productionapp*.
+- give the account number and name of the role (for AWS console users) or the Amazon Resource Name (ARN) (for AWS CLI, Tools for Windows PowerShell, or AWS API access) of the role with anyone who needs to assume the role. The role ARN might look like `arn:aws:iam::123456789012:role/UpdateAPP`.
+2. The admin of the *Development account* grants the developers permission to call STS `AssumeRole` API for the `UpdateAPP` role.
+
+## Providing Access to AWS Accounts Owned by Third Parties
+[AWS - Docs: Using an External ID for Third-Party Access](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html)
+
+You can use roles to delegate access. The third parties must provide A) its own AWS *account ID* and B) a secret *external ID*, both need to be specified in the `trust policy` for the role.
+```
+"Principal": {"AWS": "Example Corp's AWS Account ID"},
+"Condition": {"StringEquals": {"sts:ExternalId": "Unique ID Assigned by Example Corp"}}
+```
+When Example Corp needs to access your AWS resources, someone from the company calls the AWS `sts:AssumeRole` API. The call includes the ARN of the role to assume and the `ExternalID` parameter that corresponds to your customer ID. In other words, when a role policy includes an `external ID`, anyone who wants to assume the role must be a principal in the role and must include the correct `external ID` which solves the "confused deputy problem". You are an AWS account owner and you have configured a role for a third party that accesses other AWS accounts in addition to yours. You should ask the third party for an external ID that it includes when it assumes your role. Then you check for that external ID in your role's trust policy. Doing so ensures that the external party can assume your role only when it is acting on your behalf.
+![](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/confuseddeputymitigation2.png)
+
+## Custom identity broker application to federate user access to AWS
+[AWS Docs - identity broker application to federate user access to AWS](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_common-scenarios_federated-users.html)
+![identity broker application](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/enterprise-authentication-with-identity-broker-application.diagram.png "Identity Broker Application")
+
+2. The identity broker application is able to verify that employees are authenticated within the existing authentication system.
+
+3. Is doing a `AssumeRole` or `GetFederationToken` API call to STS which returns the credentials.
+
+4. Users are able to get a temporary URL that gives them access to the AWS Management Console (which is referred to as single sign-on).
+
+### Using SAML-Based Federation for API Access to AWS
+Dropbox like desktop app that copies data from computer to a backup folder in S3:
+![](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/saml-based-federation.diagram.png)
+
+### SAML-enabled single sign-on
+Inside your organization's network, you configure your identity store (such as Windows Active Directory) to work with a SAML-based identity provider (IdP) like Windows Active Directory Federation Services, Shibboleth
+![](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/saml-based-sso-to-console.diagram.png)
 
 # Enable LDAPS
 - https://aws.amazon.com/blogs/security/how-to-enable-ldaps-for-your-aws-microsoft-ad-directory/
@@ -432,3 +471,18 @@ The policy grants the user the permission to pass only the Get-pics role. If the
   ]
 }
 ```
+
+## Permissions for Federated User
+![](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/getfederationtoken-permissions.diagram.png)
+- The most common way to ensure that the federated user is assigned appropriate permission is to **pass a policy as a parameter** of the `GetFederationToken` API call. 
+  - The effective permissions for the federated user consist of only those permissions that are granted in both the IAM user policy **and** the passed policy:
+- **Resource-based Policies** provide another mechanism to grant permissions directly to a federated user. You assign permissions directly to a federated user by specifying the ARN of the federated user in the `Principal` element of the resource-based policy.
+  - A federated user is granted permissions only when those permissions are explicitly granted to both the IAM user **and** the federated user.
+
+# CloudTrail
+AWS does not log the entered user name text when the sign-in failure is caused by an incorrect user name. The user name text is masked by the value `HIDDEN_DUE_TO_SECURITY_REASONS` (accidentally type your password in the user name field?)
+
+# AWS Organizations
+service that enables you to group together and centrally manage the AWS accounts that your business owns
+## Service Control Policies SCPs
+serve as "filters" or "guardrails" that limit what services and actions can be accessed by the IAM users, groups, and roles in those accounts. If an SCP attached to an account denies access to a service, such as S3, then no user in that account can access any S3 API, even if the user has administrator permissions in the account. Even the AWS account root user is denied access to S3 APIs.
