@@ -110,6 +110,35 @@ You can only delegate permissions equivalent to, or less than, the permissions g
 2. The account B administrator grants user 1 read-only access to account A's S3 bucket. User 1 can view the objects in account A's bucket. The level of access account B can delegate is equivalent to, or less than, the access the account has. In this case, the full access granted to account B is filtered to read only for user 1.
 3. The account B administrator does not give access to user 2. Because users by default do not have any permissions except those that are explicitly granted, user 2 does not have access to account A's Amazon S3 bucket.
 
+## Example Separate Development and Production Accounts
+[AWS Docs - Separate Development and Production Accounts](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_common-scenarios_aws-accounts-example.html)
+![Separate Development and Production Accounts](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/roles-usingroletodelegate.png "Separate Development and Production Accounts")
+1. The admin of *production account*:
+- creates the `UpdateAPP` and defines a `trust policy` that specifies the  *development account* as a `Principal`: authorized users from the development account can use the UpdateAPP role. 
+- Creates a `permissions policy` for the role that specifies that users of the role have read and write permissions to the bucket named *productionapp*.
+- give the account number and name of the role (for AWS console users) or the Amazon Resource Name (ARN) (for AWS CLI, Tools for Windows PowerShell, or AWS API access) of the role with anyone who needs to assume the role. The role ARN might look like `arn:aws:iam::123456789012:role/UpdateAPP`.
+2. The admin of the *Development account* grants the developers permission to call STS `AssumeRole` API for the `UpdateAPP` role.
+
+## Providing Access to AWS Accounts Owned by Third Parties
+You can use roles to delegate access. The third parties must provide A) its own AWS *account ID* and B) a secret *external ID*, both need to be specified in the `trust policy` for the role.
+
+## Custom identity broker application to federate user access to AWS
+[AWS Docs - identity broker application to federate user access to AWS](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_common-scenarios_federated-users.html)
+![identity broker application](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/enterprise-authentication-with-identity-broker-application.diagram.png "Identity Broker Application")
+
+2. The identity broker application is able to verify that employees are authenticated within the existing authentication system.
+
+3. Is doing a `AssumeRole` or `GetFederationToken` API call to STS which returns:
+- access key ID
+- secret access key
+- session token
+- duration (1-36 hours)
+4. Users are able to get a temporary URL that gives them access to the AWS Management Console (which is referred to as single sign-on).
+
+### Using SAML-Based Federation for API Access to AWS
+Dropbox like desktop app that copies data from computer to a backup folder in S3:
+![](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/saml-based-federation.diagram.png)
+
 ## Policies 
 ### User-based policy
 Active, "what can I do to X?". The `who` is the user that gets a policy attached to so the `Principal` is not specified in the polic.
@@ -215,3 +244,44 @@ For the Domain Controllers to request a certificate from the `subordinateCA`:
 AWS Microsoft AD Domain Controllers will automatically see the published template and they will request a certificate from the `subordinateCA`. The `subordinateCA` will take up to 180 minutes to issue the certificate to the DCs. Once this happens, the DC will receive the cert, import it and enable LDAPS.
 
 You can test the LDAPS connection to the AWS Microsoft AD directory using the `LDP tool`. The LDP tool comes with the Active Directory Administrative Tools. 
+# Cognito
+Preferred way to use web identity federation, it acts as an identity broker and does much of the federation work for you. With web identity federation, you don't need to create custom sign-in code or manage your own user identities. Instead, users of your app can sign in using a well-known identity provider (IdP) — Amazon, Facebook, Google, or any other OpenID Connect (OIDC) - compatible IdP, *receive an authentication token, and then exchange that token for temporary security credentials in AWS that map to an IAM role with permissions to use the resources in your AWS account*. Using an IdP helps you keep your AWS account secure, because you don't have to embed and distribute long-term security credentials with your application.
+
+## Example - Game App for phone with Cognito as IdP
+[AWS Docs - Cognito as IdP](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_oidc_cognito.html)
+
+User data such as scores and profiles is stored in S3 and DynamoDB.
+![Cognito](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/mobile-app-web-identity-federation.diagram.png "Cognito")
+
+# Web Identity Federation APIs for Mobile Apps
+The alternative to Cognito is to create an app that manually does an unsigned call to `AssumeRoleWithWebIdentity` API passing the web identity federation token anf the ARN for the IAM role that you created for that IdP. Once the app has obtained the temporary security credentials, it makes signed requests to AWS APIs. The app should cache the temporary security credentials so that you do not have to get new ones each time the app needs to make a request to AWS. By default, the credentials are good for one hour.
+
+## Allow access to resources using Web Identity Federation
+- https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_oidc_user-id.html
+
+To write policies that allow exclusive access to resources for individual users, you can match the complete folder name, including the app name and provider name, if you're using that. The following example shows a permission policy that grants access to a bucket in Amazon S3 only if the prefix for the bucket matches the string: `myBucket/Amazon/mynumbersgame/user1`. The example assumes that the user is signed in using Login with Amazon, and that the user is using an app called `mynumbersgame`. The user's unique ID is presented as an attribute called user_id. 
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket"],
+      "Resource": ["arn:aws:s3:::myBucket"],
+      "Condition": {"StringLike": {"s3:prefix": ["Amazon/mynumbersgame/${www.amazon.com:user_id}/*"]}}
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::myBucket/amazon/mynumbersgame/${www.amazon.com:user_id}",
+        "arn:aws:s3:::myBucket/amazon/mynumbersgame/${www.amazon.com:user_id}/*"
+      ]
+    }
+  ]
+}
+```
