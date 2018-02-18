@@ -97,12 +97,21 @@ grants access to the entire Amazon EC2 API, but denies access to StopInstances a
 ## Roles
 - Does not have standard long-term credentials (password or access keys). When a user assumes a role, temporary security credentials are created dynamically and provided to the user.
 
+## Delegation
+Create **1 IAM role** that has **two policies** attached. 
+- The **permissions policy** defines what actions and resources the role can use.
+- The **trust policy** defines who is allowed to assume the role. You cannot specify a wildcard (\*) as a `Principal`.
+
 ## Policies 
 ### User-based policy
 Active, "what can I do to X?". The `who` is the user that gets a policy attached to so the `Principal` is not specified in the polic.
 
 ### Resource-based policy (or ACL)
-Passive, "who can do what to me?" (I am the resource). The `principal` specified the **who**.
+[Roles vs. Resource-based Policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_compare-resource-policies.html).
+- Passive, "who can do what to me?" (I am the resource). The `principal` specified the **who**. For 
+- Useful for **cross-account** access. You can attach a policy directly to the resource that you want to share, instead of using a role as a proxy. The resource that you want to share must support resource-based policies (S3 buckets, Glacier vaults, SNS topics, and SQS queues). Unlike a user-based policy, a resource-based policy specifies who (in the form of a list of AWS account ID numbers) can access that resource. Advantage over a role: with a resource-based policy, the user still works in the trusted account and does not have to give up his or her user permissions in place of the role permissions (as instead has to do if using a proxy role).
+
+![Reslource-based delegation](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/Delegation.diagram.png "Delegation diagram")
 
 An S3 bucket policy that allows an IAM user named bob in AWS account 777788889999 to put objects into the bucket called example-bucket:
 ```
