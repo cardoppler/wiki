@@ -1,5 +1,27 @@
 # STS
-`AssumeRole` and `GetSessionToken` can also be called without MFA information
+
+## API methods
+- `AssumeRole`. You must call this API using existing IAM user credentials.
+- `GetSessionToken` 
+
+**Request** must contain:
+- `ARN` of the role that the app should assume.
+- `Duration`: optional, how long the temporary security credentials are valid (15 minutes to 1 hour (default)
+- `Role session name` use to identify the session in CloudTrail.
+- (Optional) `additional policy` to further restrict permissions.
+- (Optional) `MFA identifier` and OTP
+- (Optional) `ExternalID`.
+
+
+**Responses** return:
+- Access Key:
+  - Access Key ID
+  - Secret Access Key
+- Session Token
+??? Duration (1-36 hours)
+
+## Endpoints
+STS is global, but you can choose an endpoint closer to you to reduce latency.
 
 # MFA
 ## MFA Delete
@@ -97,10 +119,26 @@ grants access to the entire Amazon EC2 API, but denies access to StopInstances a
 ## Roles
 - Does not have standard long-term credentials (password or access keys). When a user assumes a role, temporary security credentials are created dynamically and provided to the user.
 
+**Service-linked role**: predefined by the service and include all the permissions that the service requires to call other AWS services on your behalf. A service might automatically create or delete the role
+
+### Role policies:
+Any role contains two policies
+- **trust policy** Defines who is allowed to assume the role (the trusted entity or principal). You cannot specify a wildcard (\*) as a `Principal`.
+- **permission policy** defines what actions and resources the role can use/do.
+
+Example. The policy specifies that the user can only switch to a role in that account if the role name begins with the letters "Test" followed by any other combination of characters.
+```
+{
+  "Version": "2012-10-17",
+  "Statement": {
+    "Effect": "Allow",
+    "Action": "sts:AssumeRole",
+    "Resource": "arn:aws:iam::ACCOUNT-ID-WITHOUT-HYPHENS:role/Test*"
+  }
+}
+```
+
 ## Delegation
-Create **1 IAM role** that has **two policies** attached. 
-- The **permissions policy** defines what actions and resources the role can use.
-- The **trust policy** defines who is allowed to assume the role. You cannot specify a wildcard (\*) as a `Principal`.
 
 You can only delegate permissions equivalent to, or less than, the permissions granted to your account by the resource owning account.
 
@@ -120,7 +158,15 @@ You can only delegate permissions equivalent to, or less than, the permissions g
 2. The admin of the *Development account* grants the developers permission to call STS `AssumeRole` API for the `UpdateAPP` role.
 
 ## Providing Access to AWS Accounts Owned by Third Parties
+[AWS - Docs: Using an External ID for Third-Party Access](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html)
+
 You can use roles to delegate access. The third parties must provide A) its own AWS *account ID* and B) a secret *external ID*, both need to be specified in the `trust policy` for the role.
+```
+"Principal": {"AWS": "Example Corp's AWS Account ID"},
+"Condition": {"StringEquals": {"sts:ExternalId": "Unique ID Assigned by Example Corp"}}
+```
+When Example Corp needs to access your AWS resources, someone from the company calls the AWS `sts:AssumeRole` API. The call includes the ARN of the role to assume and the `ExternalID` parameter that corresponds to your customer ID. In other words, when a role policy includes an `external ID`, anyone who wants to assume the role must be a principal in the role and must include the correct `external ID` which solves the "confused deputy problem". You are an AWS account owner and you have configured a role for a third party that accesses other AWS accounts in addition to yours. You should ask the third party for an external ID that it includes when it assumes your role. Then you check for that external ID in your role's trust policy. Doing so ensures that the external party can assume your role only when it is acting on your behalf.
+![](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/confuseddeputymitigation2.png)
 
 ## Custom identity broker application to federate user access to AWS
 [AWS Docs - identity broker application to federate user access to AWS](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_common-scenarios_federated-users.html)
@@ -128,27 +174,31 @@ You can use roles to delegate access. The third parties must provide A) its own 
 
 2. The identity broker application is able to verify that employees are authenticated within the existing authentication system.
 
-3. Is doing a `AssumeRole` or `GetFederationToken` API call to STS which returns:
-- access key ID
-- secret access key
-- session token
-- duration (1-36 hours)
+3. Is doing a `AssumeRole` or `GetFederationToken` API call to STS which returns the credentials.
+
 4. Users are able to get a temporary URL that gives them access to the AWS Management Console (which is referred to as single sign-on).
 
 ### Using SAML-Based Federation for API Access to AWS
 Dropbox like desktop app that copies data from computer to a backup folder in S3:
 ![](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/saml-based-federation.diagram.png)
 
+### SAML-enabled single sign-on
+Inside your organization's network, you configure your identity store (such as Windows Active Directory) to work with a SAML-based identity provider (IdP) like Windows Active Directory Federation Services, Shibboleth
+![](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/saml-based-sso-to-console.diagram.png)
+
 ## Policies 
+
 ### User-based policy
 Active, "what can I do to X?". The `who` is the user that gets a policy attached to so the `Principal` is not specified in the polic.
+
+The permissions that the role grants to the user do not add to the permissions already granted to the user. When a user **switches to a role**, the user **temporarily gives up his or her original permissions** in exchange for those granted by the role. When the user exits the role, then the original user permissions are automatically restored.
 
 ### Resource-based policy (or ACL)
 [Roles vs. Resource-based Policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_compare-resource-policies.html).
 - Passive, "who can do what to me?" (I am the resource). The `principal` specified the **who**. For 
-- Useful for **cross-account** access. You can attach a policy directly to the resource that you want to share, instead of using a role as a proxy. The resource that you want to share must support resource-based policies (S3 buckets, Glacier vaults, SNS topics, and SQS queues). Unlike a user-based policy, a resource-based policy specifies who (in the form of a list of AWS account ID numbers) can access that resource. Advantage over a role: with a resource-based policy, the user still works in the trusted account and does not have to give up his or her user permissions in place of the role permissions (as instead has to do if using a proxy role).
-
-An S3 bucket policy that allows an IAM user named bob in AWS account 777788889999 to put objects into the bucket called example-bucket:
+- Useful for **cross-account** access. You can attach a policy directly to the resource that you want to share, instead of using a role as a proxy. The resource that you want to share must support resource-based policies. Unlike a user-based policy, a resource-based policy specifies who (in the form of a list of AWS account ID numbers) can access that resource. Advantage over a role: with a resource-based policy, **the user still works in the trusted account and does not have to give up his or her user permissions in place of the role permissions** (as instead has to do if using a proxy role).
+- Not all services support resource-based policies: only S3 buckets, Glacier vaults, SNS topics, and SQS queues.
+### An S3 bucket policy that allows an IAM user named bob in AWS account 777788889999 to put objects into the bucket called example-bucket:
 ```
 {
   "Version": "2012-10-17",
@@ -281,6 +331,103 @@ To write policies that allow exclusive access to resources for individual users,
         "arn:aws:s3:::myBucket/amazon/mynumbersgame/${www.amazon.com:user_id}",
         "arn:aws:s3:::myBucket/amazon/mynumbersgame/${www.amazon.com:user_id}/*"
       ]
+    }
+  ]
+}
+```
+
+### Configure permissions in AWS for your federated users
+When you create the **trust policy** that indicates who can assume the role, you specify the SAML provider that you created earlier in IAM along with one or more SAML attributes that a user must match to be allowed to assume the role. For example, you can specify that only users whose SAML `eduPersonOrgDN` value is `ExampleOrg` are allowed to sign in. The role wizard automatically adds a condition to test the `saml:aud` attribute to make sure that the role is assumed only for sign-in to the AWS Management Console. 
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Principal": {"Federated": "arn:aws:iam::ACCOUNT-ID-WITHOUT-HYPHENS:saml-provider/ExampleOrgSSOProvider"},
+    "Action": "sts:AssumeRoleWithSAML",
+    "Condition": {"StringEquals": {
+      "saml:edupersonorgdn": "ExampleOrg",
+      "saml:aud": "https://signin.aws.amazon.com/saml"
+    }}
+  }]
+}
+```
+
+# S3
+## Bucket Policies vs ACLs
+### Bucket policy
+Account A's S3 bucket `mybucket` can be accessed by account B (account number 111122223333)
+```
+{
+  "Version": "2012-10-17",
+  "Statement": {
+    "Sid": "AccountBAccess1",
+    "Effect": "Allow",
+    "Principal": {"AWS": "111122223333"},
+    "Action": "s3:*",
+    "Resource": [
+      "arn:aws:s3:::mybucket",
+      "arn:aws:s3:::mybucket/*"
+    ]
+  }
+}
+```
+### ACLs
+**Pros**: 
+- Useful when a bucket owner allows other AWS accounts to upload objects, permissions to these objects can only be managed using object ACL by the AWS account that owns the object.
+
+**Cons**:
+- you can grant permissions only to **other AWS accounts** not to users in your account. 
+- No conditional permissions, 
+- No explicit deny
+
+### Explicit deny and overrides
+[AWS - Docs](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_policy-examples.html)
+
+Account A writes a bucket policy on account A's S3 bucket that **explicitly denies** account B access to account A's bucket:
+```
+{
+  "Version": "2012-10-17",
+  "Statement": {
+    "Sid": "AccountBDeny",
+    "Effect": "Deny",
+    "Principal": {"AWS": "111122223333"},
+    "Action": "s3:*",
+    "Resource": "arn:aws:s3:::mybucket/*"
+  }
+}
+```
+Now even if account B writes an IAM user policy that grants a user in account B access to account A's bucket, the explicit deny applied to account A's S3 bucket propagates to the users in account B and overrides the IAM user policy granting access to the user in account B ==> Users in account B won't be able to access A's S3 bucket
+
+# EC2
+## Instance profile
+[AWS Docs - Using Roles for Applications on Amazon EC2](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html)
+- Contains a role and provides the role's temporal credentials so an app running on an EC2 instance can assume the role and use the instance privileges for accessing other AWS resources via these temp credentials, for example to query RDS database. REmove the need to hardcoded long-term creds(i.e. username and pw) into applications.
+- Only one role can be assigned to an EC2 instance at a time, and all applications on the instance share the same role and permissions.
+
+### Example - App that needs access to S3:
+![](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/roles-usingrole-ec2roleinstance.png)
+- The developer runs an application on an EC2 instance that requires access to the S3 bucket named photos. 
+- An administrator creates the Get-pics role. The role includes policies that grant read permissions for the bucket and that allow the developer to launch the role with an EC2 instance. 
+- When the application runs on the instance, it can use the role's temporary credentials to access the photos bucket. 
+- The administrator doesn't have to grant the developer permission to access the photos bucket
+- The developer never has to share or manage credentials.
+
+### Example policy that grants a user permission to launch an EC2 instance with a specific role:
+The policy grants the user the permission to pass only the Get-pics role. If the user tries to specify a different role when launching an instance, the action fails.
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "ec2:RunInstances",
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": "arn:aws:iam::ACCOUNT-ID-WITHOUT-HYPHENS:role/Get-pics"
     }
   ]
 }
