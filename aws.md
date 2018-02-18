@@ -92,7 +92,7 @@ grants access to the entire Amazon EC2 API, but denies access to StopInstances a
 - User *--* Group
 - can't be nested (contain only users not other groups)
 - If you **change a group's name** or path: policies attached to the group stay with the group, group retains all its users, unique ID remains the same. But IAM does not automatically update policies that refer to the group as a resource to use the new name.
-- If you **delete a group** in the Console, it removes all group members, detaches all attached managed policies, and deletes all inline policies. The coomand-line doesn't, so you must remove everything before removing the group from the command line.
+- If you **delete a group** in the Console, it removes all group members, detaches all attached managed policies, and deletes all inline policies. The command-line doesn't, so you must remove everything before removing the group from the command line.
 
 ## Roles
 - Does not have standard long-term credentials (password or access keys). When a user assumes a role, temporary security credentials are created dynamically and provided to the user.
@@ -104,7 +104,7 @@ Create **1 IAM role** that has **two policies** attached.
 
 You can only delegate permissions equivalent to, or less than, the permissions granted to your account by the resource owning account.
 
-![Reslource-based delegation](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/Delegation.diagram.png "Delegation diagram")
+![Resource-based delegation](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/Delegation.diagram.png "Delegation diagram")
 
 1. Account A gives account B full access to account A's S3 bucket by naming account B as a principal in the policy. As a result, account B is authorized to perform any action on account A's bucket, and the account B administrator can delegate access to its users in account B.
 2. The account B administrator grants user 1 read-only access to account A's S3 bucket. User 1 can view the objects in account A's bucket. The level of access account B can delegate is equivalent to, or less than, the access the account has. In this case, the full access granted to account B is filtered to read only for user 1.
