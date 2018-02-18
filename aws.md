@@ -87,11 +87,21 @@ grants access to the entire Amazon EC2 API, but denies access to StopInstances a
 - When the user is authenticated by an external provider (`AssumeRoleWithWebIdentity` and `AssumeRoleWithSAML`) AWS cannot determine whether that provider required MFA. So **federated users** cannot be assigned an MFA device for use with AWS services, so they cannot access AWS resources controlled by MFA. 
 - For **cross-account** delegation, if the role's trust policy doesn’t include an MFA condition then there is no MFA protection for the API calls that are made with the role's temporary security credentials. When you allow another AWS account to access resources in your account, even when you require multi-factor authentication, the security of your resources depends on the configuration of the trusted account aka the other account (not yours). Any identity in the trusted account that has permission to create virtual MFA devices can construct an MFA claim to satisfy that part of your role's trust policy. Before you allow another account's access to your AWS resources that require multi-factor authentication, you should ensure that the trusted account's owner follows security best practices and restricts access to sensitive APIs—such as MFA device-management APIs—to specific, trusted identities.
 
-# IAM policies
-## User-based policy
+# IAM
+## Groups
+- User *--* Group
+- can't be nested (contain only users not other groups)
+- If you **change a group's name** or path: policies attached to the group stay with the group, group retains all its users, unique ID remains the same. But IAM does not automatically update policies that refer to the group as a resource to use the new name.
+- If you **delete a group** in the Console, it removes all group members, detaches all attached managed policies, and deletes all inline policies. The coomand-line doesn't, so you must remove everything before removing the group from the command line.
+
+## Roles
+- Does not have standard long-term credentials (password or access keys). When a user assumes a role, temporary security credentials are created dynamically and provided to the user.
+
+## Policies 
+### User-based policy
 Active, "what can I do to X?". The `who` is the user that gets a policy attached to so the `Principal` is not specified in the polic.
 
-## Resource-based policy (or ACL)
+### Resource-based policy (or ACL)
 Passive, "who can do what to me?" (I am the resource). The `principal` specified the **who**.
 
 An S3 bucket policy that allows an IAM user named bob in AWS account 777788889999 to put objects into the bucket called example-bucket:
