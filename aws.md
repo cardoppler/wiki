@@ -102,6 +102,14 @@ Create **1 IAM role** that has **two policies** attached.
 - The **permissions policy** defines what actions and resources the role can use.
 - The **trust policy** defines who is allowed to assume the role. You cannot specify a wildcard (\*) as a `Principal`.
 
+You can only delegate permissions equivalent to, or less than, the permissions granted to your account by the resource owning account.
+
+![Reslource-based delegation](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/Delegation.diagram.png "Delegation diagram")
+
+1. Account A gives account B full access to account A's S3 bucket by naming account B as a principal in the policy. As a result, account B is authorized to perform any action on account A's bucket, and the account B administrator can delegate access to its users in account B.
+2. The account B administrator grants user 1 read-only access to account A's S3 bucket. User 1 can view the objects in account A's bucket. The level of access account B can delegate is equivalent to, or less than, the access the account has. In this case, the full access granted to account B is filtered to read only for user 1.
+3. The account B administrator does not give access to user 2. Because users by default do not have any permissions except those that are explicitly granted, user 2 does not have access to account A's Amazon S3 bucket.
+
 ## Policies 
 ### User-based policy
 Active, "what can I do to X?". The `who` is the user that gets a policy attached to so the `Principal` is not specified in the polic.
@@ -110,8 +118,6 @@ Active, "what can I do to X?". The `who` is the user that gets a policy attached
 [Roles vs. Resource-based Policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_compare-resource-policies.html).
 - Passive, "who can do what to me?" (I am the resource). The `principal` specified the **who**. For 
 - Useful for **cross-account** access. You can attach a policy directly to the resource that you want to share, instead of using a role as a proxy. The resource that you want to share must support resource-based policies (S3 buckets, Glacier vaults, SNS topics, and SQS queues). Unlike a user-based policy, a resource-based policy specifies who (in the form of a list of AWS account ID numbers) can access that resource. Advantage over a role: with a resource-based policy, the user still works in the trusted account and does not have to give up his or her user permissions in place of the role permissions (as instead has to do if using a proxy role).
-
-![Reslource-based delegation](https://docs.aws.amazon.com/IAM/latest/UserGuide/images/Delegation.diagram.png "Delegation diagram")
 
 An S3 bucket policy that allows an IAM user named bob in AWS account 777788889999 to put objects into the bucket called example-bucket:
 ```
