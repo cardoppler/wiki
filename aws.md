@@ -1,3 +1,5 @@
+`canonical user ID`, which is a 64-digit-alphanumeric-value obfuscated form of the AWS account ID.
+
 # STS
 
 ## API methods
@@ -392,10 +394,26 @@ When you create the **trust policy** that indicates who can assume the role, you
 }
 ```
 
-# S3
-## Bucket Policies vs ACLs
-### Bucket policy
-Account A's S3 bucket `mybucket` can be accessed by account B (account number 111122223333)
+# S3 Access Management
+- **User-based**
+-  **Resource-based** policies: Bucket policies and Bucket ACLs, and Object ACLs.
+- If you create an IAM user, your AWS account is the parent owner. If the IAM user uploads an object, the parent account, to which the user belongs, owns the object.
+- A bucket owner (who pays the bill) can explicitly deny access to objects in the bucket even if he does not own the object himself. The bucket owner can also delete any object in the bucket, even if he does not own those objects. A bucket owner can enable other AWS accounts to upload objects. These objects are owned by the accounts that created them. The bucket owner does not own objects that were not created by the bucket owner. Therefore, for the bucket owner to grant access to these objects, the object owner must first grant permission to the bucket owner using an **object ACL**. The bucket owner can then delegate those permissions via a **bucket policy**.
+- You can require that your users access your Amazon S3 content by using CloudFront URLs (instead of Amazon S3 URLs). To do this, create a CloudFront origin access identity (OAI), and then change the permissions either on your bucket or on the objects in your bucket.
+- **Conditions**: key names are preceded by the prefix s3:. For example, `s3:x-amz-acl`.
+
+## Evaluation Logic
+User context > Bucket Context > Object Context
+![](https://docs.aws.amazon.com/AmazonS3/latest/dev/images/example50-policy-eval-logic.png)
+
+## User Policy
+- You cannot grant anonymous permissions in an IAM user policy, because the policy is attached to a user. 
+
+## Bucket policy
+- You must use a bucket policy for **cross-account permissions** to other AWS accounts or users in another account.
+- bucket policies are limited to 20 KB in size.
+
+Example - Account A's S3 bucket `mybucket` can be accessed by account B (account number 111122223333)
 ```
 {
   "Version": "2012-10-17",
@@ -411,14 +429,56 @@ Account A's S3 bucket `mybucket` can be accessed by account B (account number 11
   }
 }
 ```
-### ACLs
+
+Example - grants anonymous (i.e. `"Principal": "*"`)read permission on all objects in a bucket:
+```
+{
+    "Version":"2012-10-17",
+    "Statement": [
+        {
+            "Effect":"Allow",
+            "Principal": "*",
+            "Action":["s3:GetObject"],
+            "Resource":["arn:aws:s3:::examplebucket/*"]
+        }
+    ]
+}
+```
+## ACLs
+- ACLs use an Amazon S3–specific **XML schema**.
+- Each bucket and object has an ACL associated with it
 **Pros**: 
 - Useful when a bucket owner allows other AWS accounts to upload objects, permissions to these objects can only be managed using object ACL by the AWS account that owns the object.
+- **An object ACL is the only way to manage access to objects not owned by the bucket owner**. A bucket owner cannot grant permissions on objects it does not own. An AWS account that owns the bucket can grant another AWS account permission to upload objects. The bucket owner does not own these objects. The AWS account that created the object must grant permissions using object ACLs.
+- **object ACL** is also limited to a maximum of 100 grants
+- The **only recommended use case for the bucket ACL** is to grant write permission to the **S3 Log Delivery** group to write access log objects to your bucket .
+
 
 **Cons**:
 - you can grant permissions only to **other AWS accounts** not to users in your account. 
 - No conditional permissions, 
 - No explicit deny
+
+Example -  a bucket owner as having full control permission:
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<AccessControlPolicy xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+  <Owner>
+    <ID>*** Owner-Canonical-User-ID ***</ID>
+    <DisplayName>owner-display-name</DisplayName>
+  </Owner>
+  <AccessControlList>
+    <Grant>
+      <Grantee xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+               xsi:type="Canonical User">
+        <ID>*** Owner-Canonical-User-ID ***</ID>
+        <DisplayName>display-name</DisplayName>
+      </Grantee>
+      <Permission>FULL_CONTROL</Permission>
+    </Grant>
+  </AccessControlList>
+</AccessControlPolicy> 
+```
 
 ### Explicit deny and overrides
 [AWS - Docs](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_policy-examples.html)
@@ -437,6 +497,14 @@ Account A writes a bucket policy on account A's S3 bucket that **explicitly deni
 }
 ```
 Now even if account B writes an IAM user policy that grants a user in account B access to account A's bucket, the explicit deny applied to account A's S3 bucket propagates to the users in account B and overrides the IAM user policy granting access to the user in account B ==> Users in account B won't be able to access A's S3 bucket
+
+### Example - Bucket Owner Granting Cross-account Permission to Objects It Does Not Own:
+![](https://docs.aws.amazon.com/AmazonS3/latest/dev/images/access-policy-ex4.png)
+1. Account A administrator user attaches a bucket policy granting Account B conditional permission to upload objects.
+2. Account A administrator creates an IAM role, establishing trust with Account C, so users in that account can access Account A. The access policy attached to the role limits what user in Account C can do when the user accesses Account A.
+3. Account B administrator uploads an object to the bucket owned by Account A, granting full-control permission to the bucket owner.
+4. Account C administrator creates a user and attaches a user policy that allows the user to assume the role.
+5. User in Account C first assumes the role, which returns the user temporary security credentials. Using those temporary credentials, the user then accesses objects in the bucket.
 
 # EC2
 ## Instance profile
