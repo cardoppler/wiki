@@ -1,3 +1,7 @@
+### Show local admins
+```
+> net localgroup administrators
+```
 ### Query Event Log
 ```
 > Get-WinEvent -ProviderName eventlog | Where-Object {$_.Id -eq 6005 -or $_.Id -eq 6006}
