@@ -1,3 +1,15 @@
+### Query Event Log
+```
+> Get-WinEvent -ProviderName eventlog | Where-Object {$_.Id -eq 6005 -or $_.Id -eq 6006}
+
+   ProviderName: EventLog
+
+TimeCreated                     Id LevelDisplayName Message
+-----------                     -- ---------------- -------
+09/02/2018 08:45:50           6005 Information      The Event log service was started.
+09/02/2018 08:37:49           6006 Information      The Event log service was stopped.
+```
+
 ### Active-Directory
 ```
 Get-ADUser SOMEUSERNAME -Properties *
