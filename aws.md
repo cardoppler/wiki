@@ -1,4 +1,10 @@
-`canonical user ID`, which is a 64-digit-alphanumeric-value obfuscated form of the AWS account ID.
+
+# READ ABOUT:
+- Athena
+- Inspector. How to find CVEs and deviations from benchmarks
+- EC2 System Manager
+
+`canonical user ID` is a 64-digit-alphanumeric-value obfuscated form of the AWS account ID.
 
 # STS
 
