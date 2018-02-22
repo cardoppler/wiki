@@ -206,6 +206,50 @@ Trust policy of an IAM role that includes an MFA condition to test for the exist
 }
 ```
 
+# Key-policy
+CMK key policy (a special case of resource policy)for EBS
+```
+{
+    "Sid": "Allow for use of this Key",
+    "Effect": "Allow",
+    "Principal": {
+        "AWS": "arn:aws:iam::111122223333:role/UserRole"
+    },
+    "Action": [
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:Decrypt"
+    ],
+    "Resource": "*"
+},
+{
+    "Sid": "Allow for EC2 Use",
+    "Effect": "Allow",
+    "Principal": {
+        "AWS": "arn:aws:iam::111122223333:role/UserRole"
+    },
+    "Action": [
+        "kms:CreateGrant",
+        "kms:ListGrants",
+        "kms:RevokeGrant"
+    ],
+    "Resource": "*",
+    "Condition": {
+        "StringEquals": {
+            "kms:ViaService": "ec2.us-west-2.amazonaws.com"
+        }
+    }
+}
+```
+- The first statement provides a specified IAM principal the ability to generate a data key and decrypt that data key from the CMK when necessary. These two APIs are necessary to encrypt the EBS volume while it’s attached to an Amazon Elastic Compute Cloud (EC2) instance.
+- The second statement in this policy provides the specified IAM principal the ability to create, list, and revoke grants for Amazon EC2.  In this case, the condition policy explicitly ensures that only Amazon EC2 can use the grants. Amazon EC2 will use them to re-attach an encrypted EBS volume back to an instance if the volume gets detached due to a planned or unplanned outage
+
+- When you use `NotPrincipal` in the same policy statement as `"Effect: Deny"`, the permissions specified in the policy statement are explicitly denied to all principals except for the ones specified.
+
+
+### Key-policies vs Grants
+- **Key policies** work best for relatively **static assignments** of permissions. To enable more granular permissions management, you can use grants. 
+- **Grants** are useful when you want to define scoped-down, **temporary permissions** for other principals to **use your CMK on your behalf** in the absence of a direct API call from you.
+
 ### What does this do?
 - `"Effect": "Deny"`
 - `"NotAction"`
