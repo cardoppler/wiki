@@ -1,8 +1,8 @@
 ## Active-Directory
-``
+```
 Get-ADUser EXAMEUSERNAME -Properties *
 Get-ADComputer EXACTCOMPUTERNAME -Properties *
-``
+```
 ### Filter by name
 ```
  > Get-ADComputer -Filter {Name -Like "PARTIALHOSTNAMEHERE*"} | Format-Table Name, DistinguishedName
