@@ -1,8 +1,12 @@
 ## Active-Directory
 ``
-Get-ADUser SOMEUSERNAME -Properties *
-Get-ADComputer SOMECOMPUTERNAME -Properties *
+Get-ADUser EXAMEUSERNAME -Properties *
+Get-ADComputer EXACTCOMPUTERNAME -Properties *
 ``
+### Filter by name
+```
+ > Get-ADComputer -Filter {Name -Like "PARTIALHOSTNAMEHERE*"} | Format-Table Name, DistinguishedName
+```
 ### Search AD for computers with a given the OS:
 ```
 > Get-ADComputer -Filter {OperatingSystem -Like "Windows Server 2012 R2 Standard"} -Property * | Format-Table Name,OperatingSystem -Wrap -Auto
