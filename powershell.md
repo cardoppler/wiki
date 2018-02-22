@@ -7,6 +7,10 @@ Get-ADComputer EXACTCOMPUTERNAME -Properties *
 ```
  > Get-ADComputer -Filter {Name -Like "PARTIALHOSTNAMEHERE*"} | Format-Table Name, DistinguishedName
 ```
+### Search in a different domain:
+```
+Get-ADComputer -Filter {(Name -Like "PARTIALNAME*") -And (OperatingSystem -Like "*Server*")} -SearchBase "DC=some,DC=thing,DC=com" -Server "some.thing.com" -Properties *
+```
 ### Search AD for computers with a given the OS:
 ```
 > Get-ADComputer -Filter {OperatingSystem -Like "Windows Server 2012 R2 Standard"} -Property * | Format-Table Name,OperatingSystem -Wrap -Auto
@@ -15,6 +19,11 @@ Name            OperatingSystem
 ----            ---------------
 SOMESERVERNAME1 Windows Server 2012 R2 Standard
 SOMESERVERNAME2 Windows Server 2012 R2 Standard
+```
+# Get all Domain Controllers from all Domains:
+```
+> Get-ADDomainController -Filter * | Select-Object Name
+> nltest /dclist:somedomain.com
 ```
 ### Show local admins
 ```
@@ -241,11 +250,6 @@ Write-Output "[+] Add done. File: <pingAll_output.csv> created."
 > $Env:ASPNETCORE_ENVIRONMENT
 ```
 
-
-Get all Domain Controllers from all Domains:
-```
-> nltest /dclist:somedomain.com
-```
 
 ```
 > query session
