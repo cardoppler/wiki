@@ -1,3 +1,17 @@
+## Active-Directory
+``
+Get-ADUser SOMEUSERNAME -Properties *
+Get-ADComputer SOMECOMPUTERNAME -Properties *
+``
+### Search AD for computers with a given the OS:
+```
+> Get-ADComputer -Filter {OperatingSystem -Like "Windows Server 2012 R2 Standard"} -Property * | Format-Table Name,OperatingSystem -Wrap -Auto
+
+Name            OperatingSystem
+----            ---------------
+SOMESERVERNAME1 Windows Server 2012 R2 Standard
+SOMESERVERNAME2 Windows Server 2012 R2 Standard
+```
 ### Show local admins
 ```
 > net localgroup administrators
@@ -12,12 +26,6 @@ TimeCreated                     Id LevelDisplayName Message
 -----------                     -- ---------------- -------
 09/02/2018 08:45:50           6005 Information      The Event log service was started.
 09/02/2018 08:37:49           6006 Information      The Event log service was stopped.
-```
-
-### Active-Directory
-```
-Get-ADUser SOMEUSERNAME -Properties *
-Get-ADComputer SOMECOMPUTERNAME -Properties *
 ```
 
 ### Convert time to human readable
