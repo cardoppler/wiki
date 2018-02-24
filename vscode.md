@@ -100,6 +100,15 @@ After replacement:
     {
         "key": "f8",
         "command": "workbench.action.terminal.runSelectedText"
+    },
+        {
+        "key": "ctrl+shift+b",
+        "command": "workbench.action.toggleSidebarVisibility"
+    },
+    {
+        "key": "ctrl+b",
+        "command": "editor.action.insertSnippet",
+        "args": { "snippet": "**$TM_SELECTED_TEXT**" }
     }
 ]
 ```
