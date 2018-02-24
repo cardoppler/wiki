@@ -80,3 +80,26 @@ After replacement:
     "window.zoomLevel": -2
 }
 ```
+
+# keybindings.json
+```
+// Place your key bindings in this file to overwrite the defaults
+[{
+    "key": "ctrl+left",
+    "command": "cursorWordEndLeft",
+    "when": "editorTextFocus"
+},{
+    "key": "ctrl+right",
+    "command": "cursorWordStartRight",
+    "when": "editorTextFocus"
+},
+    {
+        "key": "ctrl+shift+enter",
+        "command": "workbench.action.toggleMaximizedPanel"
+    },
+    {
+        "key": "f8",
+        "command": "workbench.action.terminal.runSelectedText"
+    }
+]
+```
