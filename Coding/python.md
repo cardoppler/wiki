@@ -9,3 +9,8 @@ pip freeze > requirements.txt
 pip install -r requirements.txt
 deactivate
 ```
+
+## Serve files from local directory:
+```
+# python -m SimpleHTTPServer 80
+```

