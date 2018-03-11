@@ -47,10 +47,17 @@ TimeCreated                     Id LevelDisplayName Message
 ```
 
 ### Calculate MD5 hash
-With cmd prompt: `CertUtil -hashfile C:\path\to\file.exe MD5`
-With Powershell: `Get-FileHash C:\path\to\file.exe -Algorithm MD5`
+- With cmd prompt: 
+```
+CertUtil -hashfile C:\path\to\file.exe MD5
+```
 
-Start with a different HOME location: `Right click on PW icon > Property > "Start in"`
+- With Powershell: 
+```
+Get-FileHash C:\path\to\file.exe -Algorithm MD5`
+```
+
+Start with a different HOME location: Right click on PW icon > Property > "Start in"
 
 ### Profile location:
 
@@ -381,6 +388,64 @@ then add an alias in profile.ps1 to call it from anywhere:
 ```
 New-Alias someocmmandnamehere \\path\to\user\Documents\PowerShell\script.ps1
 ```
+
+
+
+```
+> Get-ChildItem *do*
+    Directory: C:\Users\user
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-r---  Wed, 12, 04, 17     11:09                Documents
+d-r---  Wed, 12, 04, 17     12:27                Downloads
+
+> Get-Service *net* | Where-Object Status -Like *s*
+Status   Name               DisplayName
+------   ----               -----------
+Stopped  aspnet_state       ASP.NET State Service
+Stopped  Netlogon           Netlogon
+Stopped  Netman             Network Connections
+Stopped  NetSetupSvc        Network Setup Service
+Stopped  NetTcpPortSharing  Net.Tcp Port Sharing Service
+Stopped  WMPNetworkSvc      Windows Media Player Network Sharin...
+Stopped  XboxNetApiSvc      Xbox Live Networking Service
+```
+
+```
+> Get-ChildItem -Recurse | select FullName
+```
+
+
+## Get-EventLog
+- https://technet.microsoft.com/en-us/library/ee176846.aspx
+- https://msdn.microsoft.com/en-us/powershell/reference/5.1/microsoft.powershell.management/get-eventlog
+
+```
+> get-eventlog -list
+> Get-EventLog -Newest 5 -LogName Application | Sort-Object -Property count -Descending
+> Get-EventLog -LogName System -EntryType Error
+> (Get-WinEvent -ListLog Application).ProviderNames
+```
+
+```
+> Get-Service -Name sysmon
+Status   Name               DisplayName
+------   ----               -----------
+Running  Sysmon             sysmon
+
+> Get-Service *sysmon*
+Status   Name               DisplayName
+------   ----               -----------
+Running  Sysmon             Sysmon
+```
+
+
+```
+> Get-WinEvent -FilterHashtable @{ logname = "Microsoft-Windows-Sysmon/Operational"; }
+
+> Get-WinEvent -ListLog Microsoft-Windows-Sysmon/Operational | Format-List -Property *
+```
+
 
 # Windows 10 - Burn ISO to USB
 ```
