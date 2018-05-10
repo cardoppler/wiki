@@ -82,6 +82,14 @@ json.file:
 
 # OctopusDeploy API
 ```
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using Newtonsoft.Json;
+using RestSharp;
+using RestSharp.Authenticators;
+
 public class OctopusDeployConnector
 {
     string server = "http://yourserver:port";
@@ -108,7 +116,7 @@ public class OctopusDeployConnector
         var interruptionsList = new List<InterruptionItem>();
         var currentOldest = new DateTimeOffset();
         var today = DateTimeOffset.Now;
-        var oldestWanted = today.AddDays(-10); // We want interruptions since 10 dasy ago only
+        var oldestWanted = today.AddDays(-10); // We only want interruptions within the last 10 days
         do
         {
             var interruptionsListRequest = new RestRequest(nextPage);
