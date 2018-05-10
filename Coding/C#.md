@@ -79,3 +79,54 @@ json.file:
     ]
 }    
 ```
+
+# OctopusDeploy API
+```
+public class OctopusDeployConnector
+{
+    string server = "http://yourserver:port";
+    string apiKey = "API-SECRET";
+    string apiUser = "X-Octopus-ApiKey";
+
+    RestClient client;
+
+    public OctopusDeployConnector()
+    {
+        client = new RestClient(server);
+        client.Authenticator = new HttpBasicAuthenticator(apiUser, apiKey);
+    }
+
+    public List<InterruptionItem> getDeploymentInfo()
+    {
+        var usersListrequest = new RestRequest("/api/users/");
+        usersListrequest.AddHeader(apiUser, apiKey);
+        var usersListJsonResponse = client.Execute(usersListrequest);
+        var usersListResponse = JsonConvert.DeserializeObject<UsersResponse>(usersListJsonResponse.Content);
+
+        // [https://github.com/OctopusDeploy/OctopusDeploy-Api/wiki/Interruptions] "The results will be sorted by date from most recently to least recently created. The response will be a collection of resources. This query uses pagination, so a maximum of 30 items will be returned per page of results."
+        var nextPage = "/api/interruptions/";
+        var interruptionsList = new List<InterruptionItem>();
+        var currentOldest = new DateTimeOffset();
+        var today = DateTimeOffset.Now;
+        var oldestWanted = today.AddDays(-10); // We want interruptions since 10 dasy ago only
+        do
+        {
+            var interruptionsListRequest = new RestRequest(nextPage);
+            interruptionsListRequest.AddHeader(apiUser, apiKey);
+            var interruptionsListJsonResponse = client.Execute(interruptionsListRequest);
+            var interruptionsListResponse = JsonConvert.DeserializeObject<InterruptionsResponse>(interruptionsListJsonResponse.Content);
+            nextPage = interruptionsListResponse.Links.Where(x => x.Key == "Page.Next").FirstOrDefault().Value;
+            interruptionsList.AddRange(interruptionsListResponse.Items);
+            currentOldest = interruptionsList.Min(x=> x.Created);
+            interruptionsList.Where(x => x.Created == currentOldest);
+        } while ( nextPage != null && DateTimeOffset.Compare(currentOldest, oldestWanted) >= 0 );
+
+        interruptionsList.RemoveAll(x => x.Created < oldestWanted);
+
+        foreach (var interruption in interruptionsList)
+            interruption.ResponsibleUserEmail = usersListResponse.Items.Where(x => x.Id == interruption.ResponsibleUserId).Select(x => x.EmailAddress).FirstOrDefault();
+
+        return interruptionsList;
+    }
+}
+```
