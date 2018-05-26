@@ -1,3 +1,7 @@
+### which equivalent
+> (Get-Command python.exe).Path
+C:\Users\user\AppData\Local\Programs\Python\Python36-32\python.exe
+```
 ### Calculate average:
 ```
 > $nums = 2,3,5,7,11
