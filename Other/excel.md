@@ -7,6 +7,15 @@ CTRL + 5 | Strikethrough
 2. F5 > Special... > Blanks # This selects the empty rows
 3. "Delete Sheet Rows" in the Ribbon
 
+### Add VBA function to spreadsheet
+1. File > Options >  Customize Ribbon > Tick "Developer" tab
+2. Click on new "Developer" tab in the ribbon > Visual Basic
+3. Tools > Reference > Tick "Microsoft VBScript Regular Expressions 5.5"
+4. Run Macro (F5) > Give title > Create
+5. Write the VBA script (for example the "simpleCellRegex" from https://github.com/cardoppler/wiki/blob/master/Other/excel.md)
+6. Minimize the VBA editor
+7. In Excel, type =simpleCellRegex and call the new function
+
 ### Create a function that examines a regex and spits out the result
 In this case the regex examines if a servername contains a P before 3 digits:
 
