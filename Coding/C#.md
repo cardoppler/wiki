@@ -138,3 +138,39 @@ public class OctopusDeployConnector
     }
 }
 ```
+
+# Carbon Black Response - Isolate machine via the API
+```
+using Newtonsoft.Json;
+using RestSharp;
+...
+cbResponseAPIConnector.isolatebyId("6");
+...
+public partial class Sensor  // Create this mapping with https://app.quicktype.io/#l=cs&r=json2csharp
+{
+    ...
+    [JsonProperty("id")] public long Id { get; set; }
+    [JsonProperty("network_isolation_enabled")] public bool NetworkIsolationEnabled { get; set; }
+    [JsonProperty("computer_name")] public string ComputerName { get; set; }
+}
+...
+public Sensor getSensorInfoById(string sensorId) {
+    var request = new RestRequest(string.Format("/api/v1/sensor/{0}", sensorId));
+    request.AddHeader("X-Auth-Token", "SOMETOKEHERE");
+    var response = client.Execute(request);
+    return Newtonsoft.Json.JsonConvert.DeserializeObject<Sensor>(response.Content);
+}
+...
+public Sensor isolatebyId(string sensorId) {
+    var getRequest = getSensorInfoById(sensorId);
+    var request = new RestRequest(string.Format("/api/v1/sensor/{0}", sensorId), Method.PUT);
+    request.AddHeader("X-Auth-Token", "SOMETOKEHERE");
+    request.AddHeader("Content-Type", "application/json");
+    getRequest.NetworkIsolationEnabled = false; // Toggle the isolation
+    var isolateRequestJson = JsonConvert.SerializeObject(getRequest);
+    request.AddParameter("application/json; charset=utf-8", isolateRequestJson, ParameterType.RequestBody);
+    request.RequestFormat = DataFormat.Json;
+    var response = client.Execute(request);
+    return JsonConvert.DeserializeObject<Sensor>(response.Content);
+}
+```        
