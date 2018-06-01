@@ -7,7 +7,7 @@ ALT + Click | Multiple cursors
 SHIFT + ALT + I | Cursor at the end of line
 SHIFT + CTRL + L | Cursor on same words
 CTRL + B | Toggle side bar
-SHIFT + ALT + 1 | Toggle horizontal/vertical split
+SHIFT + ALT + 0 | Toggle horizontal/vertical split
 ALT + UP/DOWN | Move line
 CTRL + K, Z | Zen mode
 SHIFT + ALT + F | Format
