@@ -1,1 +1,1 @@
-Browse to `chrome://net-internals` in the searchbar
+Browse to `chrome://net-internals` in the search bar
