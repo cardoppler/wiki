@@ -14,3 +14,12 @@ deactivate
 ```
 # python -m SimpleHTTPServer 80
 ```
+
+## Interactive TTYs with autocompletion:
+```
+python -c 'import pty; pty.spawn("/bin/bash")'
+CTRL+Z
+stty raw -echo
+fg
+[ENTER][ENTER]
+```

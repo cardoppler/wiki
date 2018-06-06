@@ -18,8 +18,12 @@ install guest additions # see picture
 
 # Tools
 
+## Chrome
+Browse to `chrome://net-internals` in the search bar
+
 ## Firefox ESR + FoxyProxy + Burps
 Install version 4.6.5 that can run on Firefox ESR v52.5.0 (32-bit) using it with Burp v1.7.27
+Install Firefox Cookies manager: https://addons.mozilla.org/en-GB/firefox/addon/cookies-manager-plus/ (It gets installed under `Tools` )
 
 ## Empire
 [Empire github](https://github.com/EmpireProject/Empire/tree/dev)
