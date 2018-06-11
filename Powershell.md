@@ -1,7 +1,9 @@
 ### which equivalent
-> (Get-Command python.exe).Path
+```
+(Get-Command python.exe).Path
 C:\Users\user\AppData\Local\Programs\Python\Python36-32\python.exe
 ```
+
 ### Calculate average:
 ```
 > $nums = 2,3,5,7,11
@@ -84,6 +86,9 @@ C:\Windows\system32> powershell "IEX(New-Object Net.WebClient).downloadString('h
 Get-ADUser EXAMEUSERNAME -Properties *
 Get-ADComputer EXACTCOMPUTERNAME -Properties *
 ```
+## List all members of an OU (e.g. desktops)
+Get-ADComputer -Filter * -SearchBase "OU=Desktops,OU=something,DC=domain,DC=com" | Select-Object -ExpandProperty Name
+
 ### Filter by name
 ```
  > Get-ADComputer -Filter {Name -Like "PARTIALHOSTNAMEHERE*"} | Format-Table Name, DistinguishedName
