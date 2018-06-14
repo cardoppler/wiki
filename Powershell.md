@@ -97,6 +97,16 @@ Get-ADComputer -Filter * -SearchBase "OU=Desktops,OU=something,DC=domain,DC=com"
 ```
 Get-ADComputer -Filter {(Name -Like "PARTIALNAME*") -And (OperatingSystem -Like "*Server*")} -SearchBase "DC=some,DC=thing,DC=com" -Server "some.thing.com" -Properties *
 ```
+# Search in a different domain with different credentials:
+```
+$creds = Get-Credential "some.domain.com\some_user"
+$creds.GetNetworkCredential().Username
+the_user
+$creds.GetNetworkCredential().Password
+the_password
+Get-ADComputer -Filter * -Credential $creds -SearchBase "OU=an_ou,OU=another_ou,DC
+=some,DC=domain,DC=com" -Server "some.domain.com" | Select-Object -ExpandProperty Name
+```
 ### Search AD for computers with a given the OS:
 ```
 > Get-ADComputer -Filter {OperatingSystem -Like "Windows Server 2012 R2 Standard"} -Property * | Format-Table Name,OperatingSystem -Wrap -Auto
