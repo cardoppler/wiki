@@ -295,6 +295,7 @@ for ($i=0; $i -lt 10; $i++) { echo $i }
 
 > $array = @("hostname01", "hostname02", "hostname03") 
 > foreach ($item in $array) { nslookup $item }
+> foreach ($item in $array) { (nslookup $item | Select-String Address | Where-Object LineNumber -eq 5).ToString().Split(' ')[-1] | Add-Content .\somefile.txt }
 ```
 ### Sort IPs
 ```
