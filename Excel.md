@@ -59,8 +59,8 @@ Resources used:
 `=IF(ISERROR(VLOOKUP(A1,Sheet2!A:A,1,FALSE)),"NotInList","InList")`
 
 ### Expand IP Range
-![](https://github.com/cardoppler/wiki/blob/master/Images/ExpandIpRange_01.png?raw=true)
-![](https://github.com/cardoppler/wiki/blob/master/Images/ExpandIpRange_02.png?raw=true)
+![](https://github.com/cardoppler/wiki/blob/master/Images/Excel/ExpandIpRange_01.png?raw=true)
+![](https://github.com/cardoppler/wiki/blob/master/Images/Excel/ExpandIpRange_02.png?raw=true)
 
 VBA function:
 ```
