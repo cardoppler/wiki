@@ -580,3 +580,14 @@ C:\WINDOWS\system32>
 ```
 
 Right click the ISO and "Mount". Now copy paste the files.
+
+# Netcat equivalent
+Listen on a given port for incoming connections
+```
+$Listener = [System.Net.Sockets.TcpListener]8080;
+$Listener.Start();
+# try to telnet from the other box
+netstat -an | findstr 8080 # You show now see an ESTABLISHED connection
+$Listener.Start(); # Close the listening service
+netstat -an | findstr 8080 # No more ESTABLISHED connections
+```
