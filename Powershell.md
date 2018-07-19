@@ -582,12 +582,14 @@ C:\WINDOWS\system32>
 Right click the ISO and "Mount". Now copy paste the files.
 
 # Netcat equivalent
-Listen on a given port for incoming connections
+Listen on a given port for incoming connections:
 ```
-$Listener = [System.Net.Sockets.TcpListener]8080;
+$Listener = [System.Net.Sockets.TcpListener]9999;
 $Listener.Start();
-# try to telnet from the other box
-netstat -an | findstr 8080 # You show now see an ESTABLISHED connection
+while($true){$client = $Listener.AcceptTcpClient();Write-Host "Connected!";$client.Close();} # (Optional) It will say "Connected"
+# try to telnet from the other box, for example with `(new-object Net.Sockets.TcpClient).Connect("SOMEHOSTNAME", 9999)`
+netstat -an | findstr 9999 # You show now see an ESTABLISHED connection
 $Listener.Start(); # Close the listening service
-netstat -an | findstr 8080 # No more ESTABLISHED connections
+netstat -an | findstr 9999 # No more ESTABLISHED connections
 ```
+If you can't `CTRL+Z`, just close powershell, it will dispose the tcp handlers automatically.
