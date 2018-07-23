@@ -593,3 +593,12 @@ $Listener.Start(); # Close the listening service
 netstat -an | findstr 9999 # No more ESTABLISHED connections
 ```
 If you can't `CTRL+Z`, just close powershell, it will dispose the tcp handlers automatically.
+
+# Port mapping
+```
+netsh interface portproxy show all # che current conf
+netsh interface portproxy delete v4tov4 listenport=443 # remove the mapping
+netsh interface portproxy show all # check it has been removed
+netsh interface portproxy add v4tov4 listenport=443 connectaddress=10.10.10.10 connectport=443 # re-add the mapping
+netsh interface portproxy show all # check again
+```
