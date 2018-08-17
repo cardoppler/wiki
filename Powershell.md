@@ -1,3 +1,11 @@
+### COnvert Base64 to pdf
+- http://manojbavikati.blogspot.com/2013/10/convert-base64-string-into-pdf-file.html
+```
+$base64EncodedString = gc .\download.txt
+$bytes = [System.Convert]::FromBase64String($base64EncodedString)
+[IO.File]::WriteAllBytes("C:\Temp\file.pdf", $bytes)
+```
+
 ### which equivalent
 ```
 (Get-Command python.exe).Path
