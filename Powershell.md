@@ -1,7 +1,10 @@
+### Not digitally signed
+`Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
+
 ### Show powershell history
 `cat (Get-PSReadlineOption).HistorySavePath`
 
-### COnvert Base64 to pdf
+### Convert Base64 to pdf
 - http://manojbavikati.blogspot.com/2013/10/convert-base64-string-into-pdf-file.html
 ```
 $base64EncodedString = gc .\download.txt
