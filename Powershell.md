@@ -1,3 +1,9 @@
+### BitLocker
+```
+manage-bde -status
+manage-bde -protectors -get C:
+```
+
 ### Not digitally signed
 `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
 
