@@ -13,6 +13,7 @@ PREFIX,c | Create new session
 PREFIX,w | Show all sessions, windows, and tabs. Arrows to browse; enter to select
 PREFIX,% | Vertical split
 PREFIX," | Horizontal split
+PREFIX | : source-file ~/.tmux.conf | Reload tmux config
 ```
 $ cat ~/.inputrc
 "\e[A":history-search-backward
