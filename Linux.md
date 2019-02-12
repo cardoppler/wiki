@@ -15,6 +15,7 @@ PREFIX % | Vertical split
 PREFIX " | Horizontal split
 PREFIX | : source-file ~/.tmux.conf | Reload tmux config
 PREFIX , | Rename Pane
+PREFIX Z | Zoom pane
 
 ```
 $ cat ~/.inputrc
