@@ -1,3 +1,24 @@
+## Let's Encrypt / certbot
+Example using DigitalOcean API to perfom TXT DNS verification (instead of website verification)
+Get the API key form Digital Ocean admin page
+
+#### Installation
+```
+apt install software-properties-common
+sudo add-apt-repository universe
+sudo add-apt-repository ppa:certbot/certbot
+apt update
+apt install certbot
+apt install python3-certbot-dns-digitalocean
+```
+
+#### Usage
+```
+certbot --help
+certbot certonly --dns-digitalocean --dns-digitalocean-credentials ~/certbot/digital_ocean_API_creds_used_by_certbot -d basedomain.com -d www.basedomain.com -d anothersubdomainfor.basedomain.com
+certbot certificates # list existing certificates
+```
+
 ## tmux
 Sessions
  -> Windows/Screens/Tabs
