@@ -1,3 +1,13 @@
+### User AD export to csv
+```
+$OUs = "OU=some_ou,DC=exmaple,DC=com","OU=another_ou,DC=example,DC=com"
+$result = $OUs | ForEach { Get-ADUser -Filter {department -like "*" -And title -like "*"} -SearchBase $_ -Properties cn,UserPrincipalName,department,lastLogon,whenCreated,title | Select-Object cn,UserPrincipalName,department,title,whenCreated,@{N='LastLogon'; E={[Datetime]::FromFileTime($_.LastLogon)}} }
+
+#$result 
+
+$result | Export-Csv -Encoding ascii -NoTypeInformation -Path "AD Export $(((get-date).ToUniversalTime()).ToString("yyyy-MM-dd HH-mm-ss")).csv"
+```
+
 ### BitLocker
 ```
 manage-bde -status
