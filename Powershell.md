@@ -1,3 +1,43 @@
+### Show running processes and loaded DLLs
+`> tasklist /m `
+
+### Show running services
+`> tasklist /svc`
+
+### Windows Management Instrumentation (WMI)
+```
+> wmic /node:[TargetIPaddr] /user:[User] /password:[Passwd] process list full
+
+# list of groups on the local system:
+> wmic -group list brief
+
+# same but issued against a remote system:
+> wmic /user:”FOREIGN_DOMAINAdmin” /password:”Password” /node:192.168.33.25 group list brief
+
+> wmic process list brief
+
+# Start the calculator
+> wmic process call create “calc.exe”
+
+> wmic bios get serialnumber
+SerialNumber
+PB026001
+
+# show installed patches
+PS Q:\> wmic qfe list
+Caption                                     CSName    Description      FixComments  HotFixID   InstallDate  InstalledBy          InstalledOn  Name  ServicePackInEffect  Status
+http://support.microsoft.com/?kbid=4033631  somehostname  Update                        KB4033631               NT AUTHORITY\SYSTEM  8/21/2018
+http://support.microsoft.com/?kbid=4049065  somehostname  Update                        KB4049065               NT AUTHORITY\SYSTEM  12/5/2017
+
+# Show local shares including hidden shares (named with a $ at the end).
+> wmic share list
+
+# list of network adapters and IP address
+> wmic nicconfig list brief
+```
+
+
+
 ### User AD export to csv
 ```
 $OUs = "OU=some_ou,DC=exmaple,DC=com","OU=another_ou,DC=example,DC=com"
