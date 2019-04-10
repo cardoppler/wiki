@@ -23,7 +23,9 @@ dns_digitalocean_token = 8c...f9
 #### Usage
 ```
 certbot --help
-certbot certonly --dns-digitalocean --dns-digitalocean-credentials ~/certbot/digital_ocean_API_creds_used_by_certbot -d basedomain.com -d www.basedomain.com -d anothersubdomainfor.basedomain.com
+
+certbot certonly  --register-unsafely-without-email --dns-digitalocean --dns-digitalocean-credentials ~/certbot/digital_ocean_API_creds_used_by_certbot -d basedomain.com -d www.basedomain.com -d anothersubdomainfor.basedomain.com
+
 certbot certificates # list existing certificates
 ```
 
