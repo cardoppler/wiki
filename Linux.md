@@ -40,6 +40,7 @@ Shortcut|Description|
 -|-
 tmux ls | Lists sessions
 tmux new -s SESSIONNAME | Create new session
+tmux a -t SESSIONNAME | Attach to session
 PREFIX c | Create new session
 PREFIX w | Show all sessions, windows, and tabs. Arrows to browse; enter to select
 PREFIX % | Vertical split
