@@ -1,6 +1,7 @@
 ## Let's Encrypt / certbot
 Example using DigitalOcean API to perfom TXT DNS verification (instead of website verification)
 Get the API key form Digital Ocean admin page
+- https://certbot-dns-digitalocean.readthedocs.io/en/stable/ 
 
 #### Installation
 ```
@@ -10,6 +11,13 @@ sudo add-apt-repository ppa:certbot/certbot
 apt update
 apt install certbot
 apt install python3-certbot-dns-digitalocean
+```
+
+Then go to DigitalOcean Admin page > API > Tokens/Keys > Generate New Personal Access Token
+and paste the token inot a file with the following format:
+```
+cat digital_ocean_API_creds_used_by_certbot
+dns_digitalocean_token = 8c...f9
 ```
 
 #### Usage
