@@ -34,7 +34,17 @@ Sessions
  -> Windows/Screens/Tabs
   -> Splits/Panes
 
-PREFIX is `CTRL,b`
+PREFIX is `CTRL,b` by default, to change to `CTRL,a`:
+```
+vim ~/.tmux.conf
+# remap prefix from 'C-b' to 'C-a'
+unbind C-b
+set-option -g prefix C-a
+bind-key C-a send-prefix
+
+# reload config:
+PREFIX : source-file ~/.tmux.conf 
+```
 
 Shortcut|Description|
 -|-
