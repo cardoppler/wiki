@@ -25,3 +25,4 @@ CenterActiveWindow()
 ```
 - Double click to run it
 - Try it with WinKey + Alt + UpArrow
+- TO make it work after restarts, move the script under `C:\Users\<<USER>>\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup` (or Win+R then type `shell:startup`)
