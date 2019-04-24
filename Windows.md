@@ -3,7 +3,7 @@ https://superuser.com/questions/156351/keyboard-shortcut-in-windows-7-to-center-
 
 - Download and install AutoHotKey
 - Right lick on desktop > New > AutoHotKey Script. Calle it "CenterWindow.ahk"
-- Edit (with notepad and save
+- Edit with notepad and save
 ```
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 ; #Warn  ; Enable warnings to assist with detecting common errors.
@@ -25,4 +25,4 @@ CenterActiveWindow()
 ```
 - Double click to run it
 - Try it with WinKey + Alt + UpArrow
-- TO make it work after restarts, move the script under `C:\Users\<<USER>>\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup` (or Win+R then type `shell:startup`)
+- To make it work after restarts, move the script under `C:\Users\<<USER>>\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup` (or Win+R then type `shell:startup`)
