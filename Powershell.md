@@ -1,3 +1,17 @@
+### Create and invoke a new function:
+Create a new fie `hello.ps1`
+```
+fuction hello
+{
+Write-Output "hello from function"
+}
+```
+then load it and run it:
+```
+> . .\hello.ps1     # load
+> hello             # execute
+```
+
 ### Show running processes and loaded DLLs
 `> tasklist /m `
 
