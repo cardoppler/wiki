@@ -1,3 +1,8 @@
+### Show logs of installed applications
+a.k.a. "How to Detect Who Installed What"
+WinEventLog > Applicatoin Log > EventID `11707`
+
+
 ### WinKey + Alt + UpArrow to center window:
 https://superuser.com/questions/156351/keyboard-shortcut-in-windows-7-to-center-window
 
