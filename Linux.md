@@ -60,7 +60,7 @@ PREFIX , | Rename Pane
 PREFIX Z | Zoom pane
 
 ```
-$ cat ~/.inputrc
+$ vim ~/.inputrc
 "\e[A":history-search-backward
 "\e[B":history-search-forward
 "\e[1;5C": forward-word
@@ -68,7 +68,7 @@ $ cat ~/.inputrc
 set completion-ignore-case On
 ```
 ```
-$ cat ~/.bashrc
+$ vim ~/.bashrc
 export HISTTIMEFORMAT="%Y-%m-%d %T # "
 alias rev="bash.exe rev.sh"
 $ source ~/.bashrc
