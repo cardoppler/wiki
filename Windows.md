@@ -1,3 +1,12 @@
+### Install Git for VSCode on Windows
+Install https://git-scm.com/download/win
+- During setup wizard select `Use Visual Studio Code as Git's default editor`
+- Select `Command line and also 3rd party`
+- `OpenSSL`
+- `Windows-style`
+- `MinTTY`
+- Check: `system caching`, `cred manager`
+
 ### Show logs of installed applications
 a.k.a. "How to Detect Who Installed What"
 WinEventLog > Applicatoin Log > EventID `11707`
