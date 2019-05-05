@@ -1,3 +1,15 @@
+### Install Git for VSCode on Windows
+1. Install https://git-scm.com/download/win
+- During setup wizard select `Use Visual Studio Code as Git's default editor`
+- Select `Command line and also 3rd party`
+- `OpenSSL`
+- `Windows-style`
+- `MinTTY`
+- Check: `system caching`, `cred manager`
+
+2. Open VSCode, `F1` > `Git: Clone`
+
+### Shortcuts
 Shortcut | Description
 :-:| - 
 CTRL + K, CTRL + O | Open directory 
