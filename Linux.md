@@ -59,6 +59,7 @@ PREFIX | : source-file ~/.tmux.conf | Reload tmux config
 PREFIX , | Rename Pane
 PREFIX Z | Zoom pane
 
+### inputrc
 ```
 $ vim ~/.inputrc
 "\e[A":history-search-backward
@@ -67,11 +68,21 @@ $ vim ~/.inputrc
 "\e[1;5D": backward-word
 set completion-ignore-case On
 ```
+
+### bashrc
 ```
 $ vim ~/.bashrc
+# Time format "yyyy-mm-dd hh:mm"
 export HISTTIMEFORMAT="%Y-%m-%d %T # "
-alias rev="bash.exe rev.sh"
-$ source ~/.bashrc
+# Avoid duplicates
+export HISTCONTROL=ignoredups:erasedups
+# When the shell exits, append to the history file instead of overwriting it
+shopt -s histappend
+# After each command, append to the history file and reread it
+export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
+# Big history
+export HISTSIZE=100000
+export HISTFILESIZE=100000
 ```
 
 ## Gnome
