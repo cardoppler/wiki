@@ -83,6 +83,8 @@ export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; histor
 # Big history
 export HISTSIZE=100000
 export HISTFILESIZE=100000
+
+$ source .bashrc
 ```
 
 ## Gnome
