@@ -1,3 +1,12 @@
+### Quest AD
+```
+> Add-PSSnapin Quest.ActiveRoles.ADManagement
+> get-command *qad*
+> $user = Get-QADUser riccardo.pietri
+> $usersam = $user.SamAccountName
+> $user.MemberOf | Get-QADGroup | where {$_.name -ne 'domain users'} | where {$_.name -ne 'group 1'} | where {$_.name -ne 'group 2'}
+```
+
 ### Create and invoke a new function:
 Create a new fie `hello.ps1`
 ```
