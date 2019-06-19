@@ -12,9 +12,15 @@
 ```
 apt-get upgrade
 apt-get dist-upgrade
-apt-get install -y virtualbox-guest-x11
-install guest additions # see picture
 ```
+### Install Guest Additions:
+Edit /etc/fstab:
+```
+/dev/sr0    /media/cdrom0    udf,iso9660    user,noauto         0    0 # Old:
+/dev/sr0    /media/cdrom0    udf,iso9660    user,noauto,exec    0    0 # New:
+```
+- Top bar > Devices > Insert Guest Additions.
+- Take a snapshot of the VM
 
 # Tools
 
