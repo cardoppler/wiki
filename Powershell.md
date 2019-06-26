@@ -1,3 +1,9 @@
+### Querying Google DNS with Invoke-WebRequest (returns JSON)
+```
+PS H:\> Invoke-WebRequest "https://dns.google.com/resolve?name=example.com&type=A" | Select-Object -ExpandProperty Content 
+{"Status": 0,"TC": false,"RD": true,"RA": true,"AD": true,"CD": false,"Question":[ {"name": "example.com.","type": 1}],"Answer":[ {"name": "example.com.","type": 1,"TTL": 336,"data": "93.184.216.34"}]}
+```
+
 ### Quest AD
 ```
 > Add-PSSnapin Quest.ActiveRoles.ADManagement
