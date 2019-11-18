@@ -387,6 +387,9 @@ $inputFile -match '(?<change>C\d+ xxx (?<numbers>\d+))'
 > Select-String -Path $input_path -Pattern $regex -AllMatches | Format-Table | select -First 10
 > Select-String -Path $input_path -Pattern $regex -AllMatches | %{$null = $_.Line -match $regex; $matches['target'] }
 ```
+```
+Get-ADComputer -Filter {name -like "*something*"} -Properties Description | Select-Object -ExpandProperty Description | Select-String -Pattern $regex -AllMatches | ForEach-Object { $_.matches.groups[1].value + ", " + $_.matches.groups[2].value + ", " + $_.matches.groups[3].value}
+```
 
 For loop:
 ```
