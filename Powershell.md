@@ -704,3 +704,10 @@ netsh interface portproxy show all # check it has been removed
 netsh interface portproxy add v4tov4 listenport=443 connectaddress=10.10.10.10 connectport=443 # re-add the mapping
 netsh interface portproxy show all # check again
 ```
+
+### User AD Export
+```
+$OUs = "OU=SomeOU,DC=example,DC=com","OU=AnotherOU,DC=example,DC=com"
+$result = $OUs | ForEach { Get-ADUser -Filter {department -like "*" -And title -like "*"} -SearchBase $_ -Properties cn,UserPrincipalName,department,lastLogon,whenCreated,title | Select-Object cn,UserPrincipalName,department,title,whenCreated,@{N='LastLogon'; E={[Datetime]::FromFileTime($_.LastLogon)}} }
+$result | Export-Csv -Encoding ascii -NoTypeInformation -Path "AD Export $(((get-date).ToUniversalTime()).ToString("yyyy-MM-dd HH-mm-ss")).csv"
+```
