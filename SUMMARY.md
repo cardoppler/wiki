@@ -1,5 +1,5 @@
 # Table of contents
 
-* Initial page
-* Linux.md
+* [Introduction](README.md)
+* [Linux](linux.md.md)
 
