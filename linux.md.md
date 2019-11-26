@@ -1,6 +1,6 @@
 # C\#
 
-#### C\# in VSCode:
+### C\# in VSCode:
 
 * Install VSC
 * Install code
