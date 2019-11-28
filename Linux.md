@@ -34,13 +34,20 @@ Sessions
  -> Windows/Screens/Tabs
   -> Splits/Panes
 
-Thedefault  PREFIX is `CTRL,b`; to change to `CTRL,a`:
+The default  PREFIX is `CTRL,b`; to change to `CTRL,a`:
 ```
 vim ~/.tmux.conf
 # remap prefix from 'C-b' to 'C-a'
 unbind C-b
 set-option -g prefix C-a
 bind-key C-a send-prefix
+
+#copy-paste vi-like
+set-window-option -g mode-keys vi
+bind P paste-buffer
+bind-key -T copy-mode-vi v send-keys -X begin-selection
+bind-key -T copy-mode-vi y send-keys -X copy-selection
+bind-key -T copy-mode-vi r send-keys -X rectangle-toggle
 ```
 Then reload config with: 
 ```
@@ -60,7 +67,18 @@ PREFIX | : source-file ~/.tmux.conf | Reload tmux config
 PREFIX , | Rename Pane
 PREFIX Z | Zoom pane
 
-### inputrc
+### Copy-paste
+Shortcut|Description
+-|-
+PREFIX [ | to go into copy mode
+ | move to start
+v | to start copying
+ | Select text to be copied
+y |  to copy into Tmux buffer
+PREFIX ] | to paste
+```
+
+## inputrc
 ```
 $ vim ~/.inputrc
 "\e[A":history-search-backward
