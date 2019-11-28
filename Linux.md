@@ -76,7 +76,6 @@ v | to start copying
  | Select text to be copied
 y |  to copy into Tmux buffer
 PREFIX ] | to paste
-```
 
 ## inputrc
 ```
