@@ -48,6 +48,24 @@ bind P paste-buffer
 bind-key -T copy-mode-vi v send-keys -X begin-selection
 bind-key -T copy-mode-vi y send-keys -X copy-selection
 bind-key -T copy-mode-vi r send-keys -X rectangle-toggle
+
+# split panes using | and -
+bind | split-window -h
+bind - split-window -v
+unbind '"'
+unbind %
+
+# switch panes using Alt-arrow without prefix
+bind -n M-Left select-pane -L
+bind -n M-Right select-pane -R
+bind -n M-Up select-pane -U
+bind -n M-Down select-pane -D
+
+# Enable mouse control (clickable windows, panes, resizable panes)
+set -g mouse on
+
+# don't rename windows automatically
+set-option -g allow-rename off
 ```
 Then reload config with: 
 ```
@@ -61,11 +79,12 @@ tmux new -s SESSIONNAME | Create new session
 tmux a -t SESSIONNAME | Attach to session
 PREFIX c | Create new session
 PREFIX w | Show all sessions, windows, and tabs. Arrows to browse; enter to select
-PREFIX % | Vertical split
-PREFIX " | Horizontal split
+PREFIX \| | Vertical split
+PREFIX - | Horizontal split
 PREFIX | : source-file ~/.tmux.conf | Reload tmux config
 PREFIX , | Rename Pane
 PREFIX Z | Zoom pane
+ALT + arrow | Move
 
 ### Copy-paste
 Shortcut|Description
