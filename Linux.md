@@ -109,6 +109,10 @@ set completion-ignore-case On
 ### bashrc
 ```
 $ vim ~/.bashrc
+# Start tmux when a new terminal opens
+if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+          exec tmux
+fi
 # Time format "yyyy-mm-dd hh:mm"
 export HISTTIMEFORMAT="%Y-%m-%d %T # "
 # Avoid duplicates
