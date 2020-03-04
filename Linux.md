@@ -5,10 +5,10 @@ Get the API key form Digital Ocean admin page
 
 #### Installation
 ```
-apt install software-properties-common
-sudo add-apt-repository universe
-sudo add-apt-repository ppa:certbot/certbot
 apt update
+apt install software-properties-common
+add-apt-repository universe
+add-apt-repository ppa:certbot/certbot
 apt install certbot
 apt install python3-certbot-dns-digitalocean
 ```
