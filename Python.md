@@ -1,3 +1,23 @@
+Python 3 with VSCode:
+1. Install pyenv
+https://realpython.com/intro-to-pyenv/:
+```
+brew install pyenv
+pyenv install --list
+pyenv install -v 3.8.3
+ls ~/.pyenv/versions/
+pyenv versions
+python -V
+which python
+pyenv which python
+pyenv global 3.8.3
+python -m test
+pyenv which python
+python -V
+```
+2. Install the Python extension for Visual Studio Code.
+3. Select `pyenv` as the python interpreter in VSCode (F1)
+
 ```
 mkdir project_dir
 cd project_dir
