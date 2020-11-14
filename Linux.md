@@ -34,6 +34,11 @@ Sessions
  -> Windows/Screens/Tabs
   -> Splits/Panes
 
+Install:
+```
+brew install tmux
+```
+
 The default  PREFIX is `CTRL,b`; to change to `CTRL,a`:
 ```
 vim ~/.tmux.conf
