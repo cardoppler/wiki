@@ -1,7 +1,8 @@
 ## Let's Encrypt / certbot
-Example using DigitalOcean API to perfom TXT DNS verification (instead of website verification)
-Get the API key form Digital Ocean admin page
-- https://certbot-dns-digitalocean.readthedocs.io/en/stable/ 
+> Instructions working as of 21-11-2020
+
+- Useful to create certs for projects like Gophish which might need HTTPS.
+- Use DigitalOcean API to perfom TXT DNS verification (instead of website verification)
 
 #### Installation
 ```
@@ -13,8 +14,7 @@ apt install certbot
 apt install python3-certbot-dns-digitalocean
 ```
 
-Then go to DigitalOcean Admin page > API > Tokens/Keys > Generate New Personal Access Token
-and paste the token inot a file with the following format:
+Get the API key form Digital Ocean admin page https://certbot-dns-digitalocean.readthedocs.io/en/stable/. Go to DigitalOcean Admin page > API > Tokens/Keys > Generate New Personal Access Token (Read & Write) and paste the token into a file using the following format:
 ```
 cat digital_ocean_API_creds_used_by_certbot
 dns_digitalocean_token = 8c...f9
