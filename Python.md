@@ -29,6 +29,15 @@ pip freeze > requirements.txt
 pip install -r requirements.txt
 deactivate
 ```
+or
+
+```
+cd project_dir
+virtualenv -p python3 venv
+source venv/bin/activate
+pip install .
+python3 tests/core_test.py
+```
 
 ## Serve files from local directory:
 ```
