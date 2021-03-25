@@ -327,3 +327,8 @@ com
 
 
 ## .NET syntax
+
+## Capture groups and output to csv (macos)
+```
+pcregrep -o1 -o2 -o3 -o4 --om-separator=',' '\S+ \(\S+\) - - \[(?<DATETIME>\S+)\] "(?<HTTP_METHOD>\w+) (?<HTTP_PATH>\S+) \S+ (?<HTTP_RESPONSE_CODE>\d{3})' Notes.md > output.csv
+```
